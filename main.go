@@ -68,7 +68,11 @@ func scale(filepath string) error {
 func visit(path string, f os.FileInfo, err error) error {
 	if !f.IsDir() {
 		if strings.LastIndex(path, "-m.png") < 0 {
-			scale(path)
+			savePath := path + "-m.png"
+			if _, err := os.Stat(savePath); err != nil {
+				// not exists
+				scale(path)
+			}
 		}
 	} else {
 		fmt.Printf("Visited: %s\n", path)

@@ -81,28 +81,31 @@ func visit(path string, f os.FileInfo, err error) error {
 }
 
 func main() {
-	if len(os.Args) != 2 {
+	if len(os.Args) < 2 {
 		log.Fatal(errors.New("Incorrect arguments!"))
 	}
-	root := os.Args[1]
-
-	var file *os.File
-	if f, err := os.OpenFile(root, os.O_RDONLY, 0644); err != nil {
-		log.Fatal(err)
-	} else {
-		file = f
-	}
-	defer file.Close()
-	fi, err := file.Stat()
-	if err != nil {
-		log.Fatal(err)
-	}
-	if fi.IsDir() {
-		err := filepath.Walk(root, visit)
-		if err != nil {
-			log.Fatal(err)
+	for _, root := range os.Args {
+		var file *os.File
+		if f, err := os.OpenFile(root, os.O_RDONLY, 0644); err != nil {
+			log.Println(err)
+			continue
+		} else {
+			file = f
 		}
-	} else {
-		scale(root)
+		defer file.Close()
+		fi, err := file.Stat()
+		if err != nil {
+			log.Println(err)
+			continue
+		}
+		if fi.IsDir() {
+			err := filepath.Walk(root, visit)
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+		} else {
+			scale(root)
+		}
 	}
 }

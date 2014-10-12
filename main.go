@@ -6,6 +6,7 @@ import (
 	"github.com/nfnt/resize"
 	"image"
 	_ "image/gif"
+	"image/jpeg"
 	_ "image/jpeg"
 	"image/png"
 	_ "image/png"
@@ -20,7 +21,7 @@ const (
 	MaxHeight int = 960
 )
 
-func scale(filepath string) error {
+func scale(filepath string, imagetype int) error {
 	reader, err := os.Open(filepath)
 	if err != nil {
 		log.Println(err)
@@ -42,7 +43,13 @@ func scale(filepath string) error {
 		} else {
 			im = resize.Resize(0, uint(MaxHeight), m, resize.Bilinear)
 		}
-		savePath := filepath + "-m.png"
+		var savePath string
+		switch imagetype {
+		case 1:
+			savePath = filepath + "-m.png"
+		default:
+			savePath = filepath + "-m.jpg"
+		}
 
 		fmt.Printf("%s width=%d, height=%d, saved to %s \n", filepath, bounds.Size().X, bounds.Size().Y, savePath)
 
@@ -54,7 +61,13 @@ func scale(filepath string) error {
 		}
 		defer file.Close()
 
-		err = png.Encode(file, im)
+		switch imagetype {
+		case 1:
+			err = png.Encode(file, im)
+		default:
+			err = jpeg.Encode(file, im, &jpeg.Options{100})
+		}
+
 		if err != nil {
 			log.Println(err)
 			return err
@@ -66,11 +79,19 @@ func scale(filepath string) error {
 
 func visit(path string, f os.FileInfo, err error) error {
 	if !f.IsDir() {
+		if strings.LastIndex(path, "-m.jpg") < 0 {
+			savePath := path + "-m.jpg"
+			if _, err := os.Stat(savePath); err != nil {
+				// not exists
+				scale(path, 2)
+			}
+		}
+
 		if strings.LastIndex(path, "-m.png") < 0 {
 			savePath := path + "-m.png"
 			if _, err := os.Stat(savePath); err != nil {
 				// not exists
-				scale(path)
+				scale(path, 1)
 			}
 		}
 	} else {
@@ -104,7 +125,8 @@ func main() {
 				continue
 			}
 		} else {
-			scale(root)
+			scale(root, 1)
+			scale(root, 2)
 		}
 	}
 }

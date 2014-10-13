@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/howeyc/fsnotify"
 	"github.com/nfnt/resize"
+	"github.com/oliamb/cutter"
 	"image"
 	_ "image/gif"
 	"image/jpeg"

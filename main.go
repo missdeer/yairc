@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"github.com/howeyc/fsnotify"
 	"github.com/nfnt/resize"
 	"image"
 	_ "image/gif"
@@ -14,6 +15,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 const (
@@ -21,16 +23,20 @@ const (
 	MaxHeight int = 960
 )
 
+var (
+	watcher *fsnotify.Watcher
+)
+
 func scale(filepath string, imagetype int) error {
 	reader, err := os.Open(filepath)
 	if err != nil {
-		log.Println(err)
+		log.Println(filepath, err)
 		return err
 	}
 	defer reader.Close()
 	m, _, err := image.Decode(reader)
 	if err != nil {
-		log.Println(err)
+		log.Println(filepath, err)
 		return err
 	}
 	bounds := m.Bounds()
@@ -55,7 +61,7 @@ func scale(filepath string, imagetype int) error {
 
 		var file *os.File
 		if f, err := os.OpenFile(savePath, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0644); err != nil {
-			log.Fatal(err)
+			log.Fatal(savePath, err)
 		} else {
 			file = f
 		}
@@ -69,7 +75,7 @@ func scale(filepath string, imagetype int) error {
 		}
 
 		if err != nil {
-			log.Println(err)
+			log.Println(savePath, err)
 			return err
 		}
 	}
@@ -79,21 +85,53 @@ func scale(filepath string, imagetype int) error {
 
 func visit(path string, f os.FileInfo, err error) error {
 	if !f.IsDir() {
-		if strings.LastIndex(path, "-m.jpg") < 0 && strings.LastIndex(path, "-m.png") < 0 {
-			savePath := path + "-m.jpg"
-			if _, err := os.Stat(savePath); err != nil {
-				// not exists
-				scale(path, 2)
-			}
-
-			savePath = path + "-m.png"
-			if _, err := os.Stat(savePath); err != nil {
-				// not exists
-				scale(path, 1)
-			}
-		}
+		do_scale(path)
 	} else {
 		fmt.Printf("Visited: %s\n", path)
+	}
+	return nil
+}
+
+func isDir(path string) (bool, error) {
+	var file *os.File
+	if f, err := os.OpenFile(path, os.O_RDONLY, 0644); err != nil {
+		log.Println(err)
+		return false, err
+	} else {
+		file = f
+	}
+	defer file.Close()
+	fi, err := file.Stat()
+	if err != nil {
+		log.Println(err)
+		return false, err
+	}
+	return fi.IsDir(), nil
+}
+
+func do_scale(path string) {
+	if strings.LastIndex(path, "-m.jpg") < 0 && strings.LastIndex(path, "-m.png") < 0 {
+		savePath := path + "-m.jpg"
+		if _, err := os.Stat(savePath); err != nil {
+			// not exists
+			scale(path, 2)
+		}
+
+		savePath = path + "-m.png"
+		if _, err := os.Stat(savePath); err != nil {
+			// not exists
+			scale(path, 1)
+		}
+	}
+}
+
+func watch_directory(path string, f os.FileInfo, err error) error {
+	if f.IsDir() {
+		if err := watcher.WatchFlags(path, fsnotify.FSN_CREATE|fsnotify.FSN_MODIFY); err != nil {
+			log.Println(err)
+		}
+	} else {
+		do_scale(path)
 	}
 	return nil
 }
@@ -102,30 +140,63 @@ func main() {
 	if len(os.Args) < 2 {
 		log.Fatal(errors.New("Incorrect arguments!"))
 	}
-	for i := 1; i < len(os.Args); i++ {
-		root := os.Args[i]
-		var file *os.File
-		if f, err := os.OpenFile(root, os.O_RDONLY, 0644); err != nil {
-			log.Println(err)
-			continue
-		} else {
-			file = f
-		}
-		defer file.Close()
-		fi, err := file.Stat()
+
+	if os.Args[1] == `-w` || os.Args[1] == `--watch` {
+		fmt.Println("watching directories...")
+		var err error
+		watcher, err = fsnotify.NewWatcher()
 		if err != nil {
-			log.Println(err)
-			continue
+			log.Fatal(errors.New("creating filesystem watcher failed"))
 		}
-		if fi.IsDir() {
-			err := filepath.Walk(root, visit)
-			if err != nil {
-				log.Println(err)
-				continue
+
+		go func() {
+			for {
+				select {
+				case event := <-watcher.Event:
+					if event.IsCreate() || event.IsModify() {
+						if b, e := isDir(event.Name); e == nil && b == false {
+							do_scale(event.Name)
+						}
+					}
+				case err := <-watcher.Error:
+					log.Println("error:", err)
+				}
 			}
-		} else {
-			scale(root, 1)
-			scale(root, 2)
+		}()
+
+		for i := 2; i < len(os.Args); i++ {
+			root := os.Args[i]
+			if b, e := isDir(root); e == nil && b == true {
+				err := filepath.Walk(root, watch_directory)
+				if err != nil {
+					log.Println(err)
+					continue
+				}
+			} else {
+				do_scale(root)
+			}
+		}
+
+		timer := time.NewTicker(1 * time.Hour)
+		for {
+			select {
+			case <-timer.C:
+				fmt.Println("now: ", time.Now().UTC())
+			}
+		}
+		timer.Stop()
+	} else {
+		for i := 1; i < len(os.Args); i++ {
+			root := os.Args[i]
+			if b, e := isDir(root); e == nil && b == true {
+				err := filepath.Walk(root, visit)
+				if err != nil {
+					log.Println(err)
+					continue
+				}
+			} else {
+				do_scale(root)
+			}
 		}
 	}
 }

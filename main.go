@@ -127,7 +127,7 @@ func do_scale(path string) {
 
 func watch_directory(path string, f os.FileInfo, err error) error {
 	if f.IsDir() {
-		if err := watcher.WatchFlags(path, fsnotify.FSN_CREATE|fsnotify.FSN_MODIFY); err != nil {
+		if err := watcher.WatchFlags(path, fsnotify.FSN_DELETE|fsnotify.FSN_MODIFY); err != nil {
 			log.Println(err)
 		}
 	} else {
@@ -142,7 +142,6 @@ func main() {
 	}
 
 	if os.Args[1] == `-w` || os.Args[1] == `--watch` {
-		fmt.Println("watching directories...")
 		var err error
 		watcher, err = fsnotify.NewWatcher()
 		if err != nil {
@@ -153,8 +152,15 @@ func main() {
 			for {
 				select {
 				case event := <-watcher.Event:
-					if event.IsCreate() || event.IsModify() {
-						if b, e := isDir(event.Name); e == nil && b == false {
+					if b, e := isDir(event.Name); e == nil && b == false {
+						if event.IsDelete() || event.IsModify() {
+							// delete associated files
+							if strings.LastIndex(event.Name, "-m.jpg") < 0 && strings.LastIndex(event.Name, "-m.png") < 0 {
+								os.Remove(event.Name + "-m.jpg")
+								os.Remove(event.Name + "-m.png")
+							}
+						}
+						if event.IsModify() {
 							do_scale(event.Name)
 						}
 					}
@@ -176,6 +182,7 @@ func main() {
 				do_scale(root)
 			}
 		}
+		fmt.Println("watching directories...")
 
 		timer := time.NewTicker(1 * time.Hour)
 		for {

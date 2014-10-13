@@ -102,7 +102,8 @@ func main() {
 	if len(os.Args) < 2 {
 		log.Fatal(errors.New("Incorrect arguments!"))
 	}
-	for _, root := range os.Args {
+	for i := 1; i < len(os.Args); i++ {
+		root := os.Args[i]
 		var file *os.File
 		if f, err := os.OpenFile(root, os.O_RDONLY, 0644); err != nil {
 			log.Println(err)

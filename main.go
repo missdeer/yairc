@@ -28,7 +28,102 @@ var (
 	watcher *fsnotify.Watcher
 )
 
-func scale(filepath string, imagetype int) error {
+func isDir(path string) (bool, error) {
+	var file *os.File
+	if f, err := os.OpenFile(path, os.O_RDONLY, 0644); err != nil {
+		log.Println(err)
+		return false, err
+	} else {
+		file = f
+	}
+	defer file.Close()
+	fi, err := file.Stat()
+	if err != nil {
+		log.Println(err)
+		return false, err
+	}
+	return fi.IsDir(), nil
+}
+
+func saveImage(img *image.Image, savePath string, imagetype int) (err error) {
+	var file *os.File
+	if f, err := os.OpenFile(savePath, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0644); err != nil {
+		log.Fatal(savePath, err)
+	} else {
+		file = f
+	}
+	defer file.Close()
+
+	switch imagetype {
+	case 1:
+		err = png.Encode(file, *img)
+	default:
+		err = jpeg.Encode(file, *img, &jpeg.Options{100})
+	}
+
+	if err != nil {
+		log.Println(savePath, err)
+		return err
+	}
+	return nil
+}
+
+func traverseCut(path string, f os.FileInfo, err error) error {
+	if !f.IsDir() {
+		doCutImage(path)
+	} else {
+		fmt.Printf("Visited: %s\n", path)
+	}
+	return nil
+}
+
+func doCutImage(path string) {
+	if strings.LastIndex(path, ")-p.jpg") < 0 && strings.LastIndex(path, ")-p.png") < 0 {
+		savePath := path + ")-p.jpg"
+		if _, err := os.Stat(savePath); err != nil {
+			// not exists
+			cutImage(path, 2)
+		}
+
+		savePath = path + ")-p.png"
+		if _, err := os.Stat(savePath); err != nil {
+			// not exists
+			cutImage(path, 1)
+		}
+	}
+}
+
+func cutImage(filepath string, imagetype int) error {
+	reader, err := os.Open(filepath)
+	if err != nil {
+		log.Println(filepath, err)
+		return err
+	}
+	defer reader.Close()
+	m, _, err := image.Decode(reader)
+	if err != nil {
+		log.Println(filepath, err)
+		return err
+	}
+	bounds := m.Bounds()
+
+	croppedImg, err := cutter.Crop(m, cutter.Config{
+		Width:  bounds.Size().X,
+		Height: 500,
+		Anchor: image.Point{0, 100},
+	})
+
+	var savePath string
+	switch imagetype {
+	case 1:
+		savePath = filepath + "-p.png"
+	default:
+		savePath = filepath + "-p.jpg"
+	}
+	return saveImage(&croppedImg, savePath, imagetype)
+}
+
+func scaleImage(filepath string, imagetype int) error {
 	reader, err := os.Open(filepath)
 	if err != nil {
 		log.Println(filepath, err)
@@ -60,79 +155,44 @@ func scale(filepath string, imagetype int) error {
 
 		fmt.Printf("%s width=%d, height=%d, saved to %s \n", filepath, bounds.Size().X, bounds.Size().Y, savePath)
 
-		var file *os.File
-		if f, err := os.OpenFile(savePath, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0644); err != nil {
-			log.Fatal(savePath, err)
-		} else {
-			file = f
-		}
-		defer file.Close()
-
-		switch imagetype {
-		case 1:
-			err = png.Encode(file, im)
-		default:
-			err = jpeg.Encode(file, im, &jpeg.Options{100})
-		}
-
-		if err != nil {
-			log.Println(savePath, err)
-			return err
-		}
+		return saveImage(&im, savePath, imagetype)
 	}
 
 	return nil
 }
 
-func visit(path string, f os.FileInfo, err error) error {
+func traverseScale(path string, f os.FileInfo, err error) error {
 	if !f.IsDir() {
-		do_scale(path)
+		doScaleImage(path)
 	} else {
 		fmt.Printf("Visited: %s\n", path)
 	}
 	return nil
 }
 
-func isDir(path string) (bool, error) {
-	var file *os.File
-	if f, err := os.OpenFile(path, os.O_RDONLY, 0644); err != nil {
-		log.Println(err)
-		return false, err
-	} else {
-		file = f
-	}
-	defer file.Close()
-	fi, err := file.Stat()
-	if err != nil {
-		log.Println(err)
-		return false, err
-	}
-	return fi.IsDir(), nil
-}
-
-func do_scale(path string) {
+func doScaleImage(path string) {
 	if strings.LastIndex(path, "-m.jpg") < 0 && strings.LastIndex(path, "-m.png") < 0 {
 		savePath := path + "-m.jpg"
 		if _, err := os.Stat(savePath); err != nil {
 			// not exists
-			scale(path, 2)
+			scaleImage(path, 2)
 		}
 
 		savePath = path + "-m.png"
 		if _, err := os.Stat(savePath); err != nil {
 			// not exists
-			scale(path, 1)
+			scaleImage(path, 1)
 		}
 	}
 }
 
-func watch_directory(path string, f os.FileInfo, err error) error {
+func watchDirectory(path string, f os.FileInfo, err error) error {
 	if f.IsDir() {
 		if err := watcher.WatchFlags(path, fsnotify.FSN_DELETE|fsnotify.FSN_MODIFY); err != nil {
 			log.Println(err)
 		}
 	} else {
-		do_scale(path)
+		doScaleImage(path)
 	}
 	return nil
 }
@@ -162,7 +222,7 @@ func main() {
 							}
 						}
 						if event.IsModify() {
-							do_scale(event.Name)
+							doScaleImage(event.Name)
 						}
 					}
 				case err := <-watcher.Error:
@@ -174,13 +234,13 @@ func main() {
 		for i := 2; i < len(os.Args); i++ {
 			root := os.Args[i]
 			if b, e := isDir(root); e == nil && b == true {
-				err := filepath.Walk(root, watch_directory)
+				err := filepath.Walk(root, watchDirectory)
 				if err != nil {
 					log.Println(err)
 					continue
 				}
 			} else {
-				do_scale(root)
+				doScaleImage(root)
 			}
 		}
 		fmt.Println("watching directories...")
@@ -193,17 +253,30 @@ func main() {
 			}
 		}
 		timer.Stop()
-	} else {
-		for i := 1; i < len(os.Args); i++ {
+	} else if os.Args[1] == `-c` || os.Args[1] == `--cut` {
+		for i := 2; i < len(os.Args); i++ {
 			root := os.Args[i]
 			if b, e := isDir(root); e == nil && b == true {
-				err := filepath.Walk(root, visit)
+				err := filepath.Walk(root, traverseCut)
 				if err != nil {
 					log.Println(err)
 					continue
 				}
 			} else {
-				do_scale(root)
+				doCutImage(root)
+			}
+		}
+	} else {
+		for i := 1; i < len(os.Args); i++ {
+			root := os.Args[i]
+			if b, e := isDir(root); e == nil && b == true {
+				err := filepath.Walk(root, traverseScale)
+				if err != nil {
+					log.Println(err)
+					continue
+				}
+			} else {
+				doScaleImage(root)
 			}
 		}
 	}

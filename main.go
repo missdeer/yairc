@@ -111,7 +111,7 @@ func cutImage(filepath string, imagetype int) error {
 	if bounds.Size().Y > expectHeight {
 		blockCount := bounds.Size().Y/expectHeight + 1
 
-		for i := 0; i < blockCount; i++ {
+		for i := 0; i < blockCount && i*expectHeight < bounds.Size().Y; i++ {
 			// cut first
 			croppedImg, err := cutter.Crop(m, cutter.Config{
 				Width:  bounds.Size().X,
@@ -125,12 +125,7 @@ func cutImage(filepath string, imagetype int) error {
 			}
 
 			// resize then
-			var im image.Image
-			if bounds.Size().X > MaxWidth && expectHeight*MaxWidth/bounds.Size().X < MaxHeight {
-				im = resize.Resize(uint(MaxWidth), 0, croppedImg, resize.Bilinear)
-			} else {
-				im = resize.Resize(0, uint(MaxHeight), croppedImg, resize.Bilinear)
-			}
+			im := resize.Resize(uint(MaxWidth), 0, croppedImg, resize.Bilinear)
 
 			// save to file finally
 			var savePath string

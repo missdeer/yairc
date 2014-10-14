@@ -78,14 +78,14 @@ func traverseCut(path string, f os.FileInfo, err error) error {
 }
 
 func doCutImage(path string) {
-	if strings.LastIndex(path, ")-p.jpg") < 0 && strings.LastIndex(path, ")-p.png") < 0 {
-		savePath := path + ")-p.jpg"
+	if strings.LastIndex(path, ")-p.jpg") < 0 && strings.LastIndex(path, ")-p.png") < 0 && strings.LastIndex(path, "-m.jpg") < 0 && strings.LastIndex(path, "-m.png") < 0 {
+		savePath := path + "(1)-p.jpg"
 		if _, err := os.Stat(savePath); err != nil {
 			// not exists
 			cutImage(path, 2)
 		}
 
-		savePath = path + ")-p.png"
+		savePath = path + "(1)-p.png"
 		if _, err := os.Stat(savePath); err != nil {
 			// not exists
 			cutImage(path, 1)
@@ -107,20 +107,47 @@ func cutImage(filepath string, imagetype int) error {
 	}
 	bounds := m.Bounds()
 
-	croppedImg, err := cutter.Crop(m, cutter.Config{
-		Width:  bounds.Size().X,
-		Height: 500,
-		Anchor: image.Point{0, 100},
-	})
+	expectHeight := bounds.Size().X * MaxHeight / MaxWidth
+	if bounds.Size().Y > expectHeight {
+		blockCount := bounds.Size().Y/expectHeight + 1
 
-	var savePath string
-	switch imagetype {
-	case 1:
-		savePath = filepath + "-p.png"
-	default:
-		savePath = filepath + "-p.jpg"
+		for i := 0; i < blockCount; i++ {
+			// cut first
+			croppedImg, err := cutter.Crop(m, cutter.Config{
+				Width:  bounds.Size().X,
+				Height: expectHeight,
+				Anchor: image.Point{0, i * expectHeight},
+			})
+
+			if err != nil {
+				log.Println(filepath, err)
+				return err
+			}
+
+			// resize then
+			var im image.Image
+			if bounds.Size().X > MaxWidth && expectHeight*MaxWidth/bounds.Size().X < MaxHeight {
+				im = resize.Resize(uint(MaxWidth), 0, croppedImg, resize.Bilinear)
+			} else {
+				im = resize.Resize(0, uint(MaxHeight), croppedImg, resize.Bilinear)
+			}
+
+			// save to file finally
+			var savePath string
+			switch imagetype {
+			case 1:
+				savePath = fmt.Sprintf("%s(%d)-p.png", filepath, i+1)
+			default:
+				savePath = fmt.Sprintf("%s(%d)-p.jpg", filepath, i+1)
+			}
+			fmt.Printf("%s width=%d, height=%d, cropped to %s\n", filepath, bounds.Size().X, bounds.Size().Y, savePath)
+
+			if err := saveImage(&im, savePath, imagetype); err != nil {
+				return err
+			}
+		}
 	}
-	return saveImage(&croppedImg, savePath, imagetype)
+	return nil
 }
 
 func scaleImage(filepath string, imagetype int) error {
@@ -153,7 +180,7 @@ func scaleImage(filepath string, imagetype int) error {
 			savePath = filepath + "-m.jpg"
 		}
 
-		fmt.Printf("%s width=%d, height=%d, saved to %s \n", filepath, bounds.Size().X, bounds.Size().Y, savePath)
+		fmt.Printf("%s width=%d, height=%d, scaled to %s\n", filepath, bounds.Size().X, bounds.Size().Y, savePath)
 
 		return saveImage(&im, savePath, imagetype)
 	}

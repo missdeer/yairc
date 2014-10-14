@@ -78,7 +78,10 @@ func traverseCut(path string, f os.FileInfo, err error) error {
 }
 
 func doCutImage(path string) {
-	if strings.LastIndex(path, ")-p.jpg") < 0 && strings.LastIndex(path, ")-p.png") < 0 && strings.LastIndex(path, "-m.jpg") < 0 && strings.LastIndex(path, "-m.png") < 0 {
+	if strings.LastIndex(path, ")-p.jpg") < 0 &&
+		strings.LastIndex(path, ")-p.png") < 0 &&
+		strings.LastIndex(path, "-m.jpg") < 0 &&
+		strings.LastIndex(path, "-m.png") < 0 {
 		savePath := path + "(1)-p.jpg"
 		if _, err := os.Stat(savePath); err != nil {
 			// not exists
@@ -135,7 +138,8 @@ func cutImage(filepath string, imagetype int) error {
 			default:
 				savePath = fmt.Sprintf("%s(%d)-p.jpg", filepath, i+1)
 			}
-			fmt.Printf("%s width=%d, height=%d, cropped to %s\n", filepath, bounds.Size().X, bounds.Size().Y, savePath)
+			fmt.Printf("%s width=%d, height=%d, cropped to %s\n",
+				filepath, bounds.Size().X, bounds.Size().Y, savePath)
 
 			if err := saveImage(&im, savePath, imagetype); err != nil {
 				return err
@@ -162,7 +166,8 @@ func scaleImage(filepath string, imagetype int) error {
 	if bounds.Size().X > MaxWidth || bounds.Size().Y > MaxHeight {
 		// scale it
 		var im image.Image
-		if bounds.Size().X > MaxWidth && bounds.Size().Y*MaxWidth/bounds.Size().X < MaxHeight {
+		if bounds.Size().X > MaxWidth &&
+			bounds.Size().Y*MaxWidth/bounds.Size().X < MaxHeight {
 			im = resize.Resize(uint(MaxWidth), 0, m, resize.Bilinear)
 		} else {
 			im = resize.Resize(0, uint(MaxHeight), m, resize.Bilinear)
@@ -175,7 +180,8 @@ func scaleImage(filepath string, imagetype int) error {
 			savePath = filepath + "-m.jpg"
 		}
 
-		fmt.Printf("%s width=%d, height=%d, scaled to %s\n", filepath, bounds.Size().X, bounds.Size().Y, savePath)
+		fmt.Printf("%s width=%d, height=%d, scaled to %s\n",
+			filepath, bounds.Size().X, bounds.Size().Y, savePath)
 
 		return saveImage(&im, savePath, imagetype)
 	}
@@ -193,7 +199,8 @@ func traverseScale(path string, f os.FileInfo, err error) error {
 }
 
 func doScaleImage(path string) {
-	if strings.LastIndex(path, "-m.jpg") < 0 && strings.LastIndex(path, "-m.png") < 0 {
+	if strings.LastIndex(path, "-m.jpg") < 0 &&
+		strings.LastIndex(path, "-m.png") < 0 {
 		savePath := path + "-m.jpg"
 		if _, err := os.Stat(savePath); err != nil {
 			// not exists
@@ -238,7 +245,8 @@ func main() {
 					if b, e := isDir(event.Name); e == nil && b == false {
 						if event.IsDelete() || event.IsModify() {
 							// delete associated files
-							if strings.LastIndex(event.Name, "-m.jpg") < 0 && strings.LastIndex(event.Name, "-m.png") < 0 {
+							if strings.LastIndex(event.Name, "-m.jpg") < 0 &&
+								strings.LastIndex(event.Name, "-m.png") < 0 {
 								os.Remove(event.Name + "-m.jpg")
 								os.Remove(event.Name + "-m.png")
 							}

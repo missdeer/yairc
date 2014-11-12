@@ -296,6 +296,10 @@ func main() {
 				doCutImage(root)
 			}
 		}
+	} else if os.Args[1] == `--appicon` {
+		fmt.Println("output ios app icons")
+	} else if os.Args[1] == `--launchimage` {
+		fmt.Println("output ios launch images")
 	} else {
 		for i := 1; i < len(os.Args); i++ {
 			root := os.Args[i]

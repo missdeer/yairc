@@ -3,10 +3,15 @@ TaobaoMobileImageResizer
 
 [![Build Status](https://secure.travis-ci.org/missdeer/TaobaoMobileImageResizer.png)](https://travis-ci.org/missdeer/TaobaoMobileImageResizer)
 
+=======
+预编译包下载
+----
 [![Gobuild Download](http://gobuild.io/badge/github.com/missdeer/TaobaoMobileImageResizer/downloads.svg)](http://gobuild.io/github.com/missdeer/TaobaoMobileImageResizer)
 
-Usage
+使用方法
 ----
+目前只提供命令行使用方法。
+
 ####常规用法：命令行后加入文件名或目录名，程序将所有文件，目录及子目录中的文件都生成对应的小于620*960分辨率的图片。
 	./TaobaoMobileImageResizer filename1 [filename2 filename3 ...]
 	./TaobaoMobileImageResizer directory1 [directory2 directory3 ...]

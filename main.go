@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"flag"
 	"fmt"
 	"github.com/howeyc/fsnotify"
 	"github.com/nfnt/resize"
@@ -25,8 +26,27 @@ const (
 )
 
 var (
-	watcher *fsnotify.Watcher
+	watcher        *fsnotify.Watcher
+	cut            bool
+	scale          bool
+	appicon        bool
+	launchimage    bool
+	watch          bool
+	imagedirectory string
 )
+
+func init() {
+	flag.BoolVar(&cut, "cut", false, "cut mode")
+	flag.BoolVar(&cut, "c", false, "cut mode")
+	flag.BoolVar(&scale, "scale", false, "scale mode")
+	flag.BoolVar(&scale, "s", false, "scale mode")
+	flag.BoolVar(&appicon, "appicon", false, "generate app icon")
+	flag.BoolVar(&appicon, "a", false, "generate app icon")
+	flag.BoolVar(&launchimage, "launchimage", false, "generate launch images")
+	flag.BoolVar(&launchimage, "l", false, "generate launch images")
+	flag.BoolVar(&watch, "watch", false, "watch directories change")
+	flag.BoolVar(&watch, "w", false, "watch directories change")
+}
 
 func isDir(path string) (bool, error) {
 	var file *os.File
@@ -227,11 +247,13 @@ func watchDirectory(path string, f os.FileInfo, err error) error {
 }
 
 func main() {
+	flag.Parse()
 	if len(os.Args) < 2 {
 		log.Fatal(errors.New("Incorrect arguments!"))
 	}
+	args := flag.Args()
 
-	if os.Args[1] == `-w` || os.Args[1] == `--watch` {
+	if watch {
 		var err error
 		watcher, err = fsnotify.NewWatcher()
 		if err != nil {
@@ -261,8 +283,7 @@ func main() {
 			}
 		}()
 
-		for i := 2; i < len(os.Args); i++ {
-			root := os.Args[i]
+		for _, root := range args {
 			if b, e := isDir(root); e == nil && b == true {
 				err := filepath.Walk(root, watchDirectory)
 				if err != nil {
@@ -283,9 +304,8 @@ func main() {
 			}
 		}
 		timer.Stop()
-	} else if os.Args[1] == `-c` || os.Args[1] == `--cut` {
-		for i := 2; i < len(os.Args); i++ {
-			root := os.Args[i]
+	} else if cut {
+		for _, root := range args {
 			if b, e := isDir(root); e == nil && b == true {
 				err := filepath.Walk(root, traverseCut)
 				if err != nil {
@@ -296,13 +316,12 @@ func main() {
 				doCutImage(root)
 			}
 		}
-	} else if os.Args[1] == `--appicon` {
+	} else if appicon {
 		fmt.Println("output ios app icons")
-	} else if os.Args[1] == `--launchimage` {
+	} else if launchimage {
 		fmt.Println("output ios launch images")
 	} else {
-		for i := 1; i < len(os.Args); i++ {
-			root := os.Args[i]
+		for _, root := range args {
 			if b, e := isDir(root); e == nil && b == true {
 				err := filepath.Walk(root, traverseScale)
 				if err != nil {

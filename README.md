@@ -1,5 +1,8 @@
 TaobaoMobileImageResizer
 ========================
+
+[![Build Status](https://secure.travis-ci.org/missdeer/TaobaoMobileImageResizer.png)](https://travis-ci.org/missdeer/TaobaoMobileImageResizer)
+
 [![Gobuild Download](http://gobuild.io/badge/github.com/missdeer/TaobaoMobileImageResizer/downloads.svg)](http://gobuild.io/github.com/missdeer/TaobaoMobileImageResizer)
 
 Usage

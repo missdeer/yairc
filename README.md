@@ -4,9 +4,6 @@ TaobaoMobileImageResizer
 [![Build Status](https://secure.travis-ci.org/missdeer/TaobaoMobileImageResizer.png)](https://travis-ci.org/missdeer/TaobaoMobileImageResizer)
 
 =======
-预编译包下载
-----
-[![Gobuild Download](http://gobuild.io/badge/github.com/missdeer/TaobaoMobileImageResizer/downloads.svg)](http://gobuild.io/github.com/missdeer/TaobaoMobileImageResizer)
 
 使用方法
 ----
@@ -29,3 +26,41 @@ TODO
 * 支持iOS App的launch image生成
 * 支持Android App的launch image生成
 * 也许支持iOS/Android App的app icon生成
+
+预编译包下载
+----
+
+下载不同平台对应的可执行文件（推荐）：
+
+[Darwin x86](https://github.com/missdeer/TaobaoMobileImageResizer/raw/prebuilt/TaobaoMobileImageResizer-darwin-386)
+
+[Darwin amd64](https://github.com/missdeer/TaobaoMobileImageResizer/raw/prebuilt/TaobaoMobileImageResizer-darwin-amd64)
+
+[OpenBSD x86](https://github.com/missdeer/TaobaoMobileImageResizer/raw/prebuilt/TaobaoMobileImageResizer-openbsd-386)
+
+[OpenBSD amd64](https://github.com/missdeer/TaobaoMobileImageResizer/raw/prebuilt/TaobaoMobileImageResizer-openbsd-amd64)
+
+[NetBSD x86](https://github.com/missdeer/TaobaoMobileImageResizer/raw/prebuilt/TaobaoMobileImageResizer-netbsd-386)
+
+[NetBSD amd64](https://github.com/missdeer/TaobaoMobileImageResizer/raw/prebuilt/TaobaoMobileImageResizer-netbsd-amd64)
+
+[FreeBSD x86](https://github.com/missdeer/TaobaoMobileImageResizer/raw/prebuilt/TaobaoMobileImageResizer-freebsd-386)
+
+[FreeBSD amd64](https://github.com/missdeer/TaobaoMobileImageResizer/raw/prebuilt/TaobaoMobileImageResizer-freebsd-amd64)
+
+[FreeBSD arm6](https://github.com/missdeer/TaobaoMobileImageResizer/raw/prebuilt/TaobaoMobileImageResizer-freebsd-arm)
+
+[Linux x86](https://github.com/missdeer/TaobaoMobileImageResizer/raw/prebuilt/TaobaoMobileImageResizer-linux-386)
+
+[Linux amd64](https://github.com/missdeer/TaobaoMobileImageResizer/raw/prebuilt/TaobaoMobileImageResizer-linux-amd64)
+
+[Linux arm6](https://github.com/missdeer/TaobaoMobileImageResizer/raw/prebuilt/TaobaoMobileImageResizer-linux-arm)
+
+[Windows x86](https://github.com/missdeer/TaobaoMobileImageResizer/raw/prebuilt/TaobaoMobileImageResizer-windows-386), 下载后将文件名添加后缀.exe
+
+[Windows amd64](https://github.com/missdeer/TaobaoMobileImageResizer/raw/prebuilt/TaobaoMobileImageResizer-windows-amd64),下载后将文件名添加后缀.exe 
+
+从Gobuild下载（不推荐）：
+
+[![Gobuild Download](http://gobuild.io/badge/github.com/missdeer/TaobaoMobileImageResizer/downloads.svg)](http://gobuild.io/github.com/missdeer/TaobaoMobileImageResizer)
+

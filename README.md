@@ -36,6 +36,10 @@ TODO
 
 [Darwin amd64](https://github.com/missdeer/TaobaoMobileImageResizer/raw/prebuilt/TaobaoMobileImageResizer-darwin-amd64)
 
+[DragonflyBSD x86](https://github.com/missdeer/TaobaoMobileImageResizer/raw/prebuilt/TaobaoMobileImageResizer-dragonfly-386)
+
+[DragonflyBSD amd64](https://github.com/missdeer/TaobaoMobileImageResizer/raw/prebuilt/TaobaoMobileImageResizer-dragonfly-amd64)
+
 [OpenBSD x86](https://github.com/missdeer/TaobaoMobileImageResizer/raw/prebuilt/TaobaoMobileImageResizer-openbsd-386)
 
 [OpenBSD amd64](https://github.com/missdeer/TaobaoMobileImageResizer/raw/prebuilt/TaobaoMobileImageResizer-openbsd-amd64)

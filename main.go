@@ -4,7 +4,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"github.com/howeyc/fsnotify"
+    "github.com/go-fsnotify/fsnotify"
 	"github.com/nfnt/resize"
 	"github.com/oliamb/cutter"
 	"image"
@@ -237,7 +237,7 @@ func doScaleImage(path string) {
 
 func watchDirectory(path string, f os.FileInfo, err error) error {
 	if f.IsDir() {
-		if err := watcher.WatchFlags(path, fsnotify.FSN_DELETE|fsnotify.FSN_MODIFY); err != nil {
+		if err := watcher.Add(path); err != nil {
 			log.Println(err)
 		}
 	} else {
@@ -263,9 +263,9 @@ func main() {
 		go func() {
 			for {
 				select {
-				case event := <-watcher.Event:
+				case event := <-watcher.Events:
 					if b, e := isDir(event.Name); e == nil && b == false {
-						if event.IsDelete() || event.IsModify() {
+						if (event.Op & fsnotify.Remove != 0) || (event.Op & fsnotify.Write != 0) {
 							// delete associated files
 							if strings.LastIndex(event.Name, "-m.jpg") < 0 &&
 								strings.LastIndex(event.Name, "-m.png") < 0 {
@@ -273,11 +273,11 @@ func main() {
 								os.Remove(event.Name + "-m.png")
 							}
 						}
-						if event.IsModify() {
+						if event.Op & fsnotify.Write != 0 {
 							doScaleImage(event.Name)
 						}
 					}
-				case err := <-watcher.Error:
+				case err := <-watcher.Errors:
 					log.Println("error:", err)
 				}
 			}

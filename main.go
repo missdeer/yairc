@@ -2,10 +2,10 @@ package main
 
 import (
 	"errors"
-	"flag"
 	"fmt"
-    "github.com/go-fsnotify/fsnotify"
+	"github.com/go-fsnotify/fsnotify"
 	"github.com/nfnt/resize"
+	flag "github.com/ogier/pflag"
 	"github.com/oliamb/cutter"
 	"image"
 	_ "image/gif"
@@ -265,7 +265,7 @@ func main() {
 				select {
 				case event := <-watcher.Events:
 					if b, e := isDir(event.Name); e == nil && b == false {
-						if (event.Op & fsnotify.Remove != 0) || (event.Op & fsnotify.Write != 0) {
+						if (event.Op&fsnotify.Remove != 0) || (event.Op&fsnotify.Write != 0) {
 							// delete associated files
 							if strings.LastIndex(event.Name, "-m.jpg") < 0 &&
 								strings.LastIndex(event.Name, "-m.png") < 0 {
@@ -273,7 +273,7 @@ func main() {
 								os.Remove(event.Name + "-m.png")
 							}
 						}
-						if event.Op & fsnotify.Write != 0 {
+						if event.Op&fsnotify.Write != 0 {
 							doScaleImage(event.Name)
 						}
 					}

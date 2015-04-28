@@ -28,7 +28,7 @@ var (
 )
 
 func init() {
-	flag.BoolVarP(&cut, "cut", "c", false, "cut mode")
+	flag.BoolVarP(&cut, "cut", "c", true, "cut mode")
 	flag.BoolVarP(&scale, "scale", "s", false, "scale mode")
 	flag.BoolVarP(&appicon, "appicon", "a", false, "generate ios app icon")
 	flag.BoolVarP(&launchimage, "launchimage", "l", false, "generate ios launch images")
@@ -38,24 +38,30 @@ func init() {
 func main() {
 	flag.Parse()
 	if len(os.Args) < 2 {
-		log.Fatal(errors.New("Incorrect arguments!"))
+		log.Fatal(errors.New("Incorrect arguments! Use --help to get the usage."))
 	}
-	if scale == true {
-		cut = false
-	}
+	cut = !scale
+	args := flag.Args()
 
-	if appicon {
+	// ios app icon mode
+	if appicon == true {
 		fmt.Println("output ios app icons")
+		for _, root := range args {
+			GenerateAppIcon(root)
+		}
 		return
 	}
 
-	if launchimage {
+	// ios launch image mode
+	if launchimage == true {
 		fmt.Println("output ios launch images")
+		for _, root := range args {
+			GenerateLaunchImage(root)
+		}
 		return
 	}
 
 	// taobao mode
-	args := flag.Args()
 	if watch == true {
 		var err error
 		watcher, err = fsnotify.NewWatcher()
@@ -121,6 +127,7 @@ func main() {
 				doCutImage(root)
 			}
 		}
+		return
 	}
 
 	for _, root := range args {

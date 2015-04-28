@@ -10,6 +10,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 type LaunchImageSpec struct {
@@ -47,42 +48,63 @@ func GenerateLaunchImage(origin string) error {
 	bounds := m.Bounds()
 
 	base := filepath.Base(origin)
+	base = base[:strings.Index(base, ".")]
 
 	for _, spec := range LaunchImageSpecifications {
 		savePath := base + spec.Postfix
-		// if the origin is larger than expected
 
-		// if the origin is smaller than expected
-
+		log.Println("generating ", savePath)
 		if cut == true {
-			// cut first
-			croppedImg, err := cutter.Crop(m, cutter.Config{
+			// if the origin is smaller than expected
+			if bounds.Size().X >= spec.Width && bounds.Size().Y < spec.Height {
+				// scale first, then cut
+				m = resize.Resize(0, uint(spec.Height), m, resize.Bilinear)
+				log.Printf("first resized to %d * %d\n", m.Bounds().Size().X, m.Bounds().Size().Y)
+				goto do_cut
+			}
+
+			if bounds.Size().X < spec.Width && bounds.Size().Y >= spec.Height {
+				// scale first, then cut
+				m = resize.Resize(uint(spec.Width), 0, m, resize.Bilinear)
+				log.Printf("or resized to %d * %d\n", m.Bounds().Size().X, m.Bounds().Size().Y)
+				goto do_cut
+			}
+
+			if bounds.Size().X < spec.Width && bounds.Size().Y < spec.Height {
+				// fall through, just scale
+				goto do_scale
+			}
+		do_cut:
+			// if the origin is larger than expected
+			im, err := cutter.Crop(m, cutter.Config{
 				Width:  spec.Width,
 				Height: spec.Height,
-				Anchor: image.Point{0, 0},
+				Anchor: image.Point{(m.Bounds().Size().X - spec.Width) / 2, (m.Bounds().Size().Y - spec.Height) / 2},
 			})
+			log.Printf("cropped to %d * %d\n", im.Bounds().Size().X, im.Bounds().Size().Y)
 
 			if err != nil {
 				log.Println(savePath, err)
-				return err
+				continue
 			}
 
-			if err := saveImage(&croppedImg, savePath, 1); err != nil {
-				return err
-			}
-		}
-		if scale == true {
-			// scale it
-			var im image.Image
-			if bounds.Size().X > spec.Width &&
-				bounds.Size().Y*spec.Width/bounds.Size().X < spec.Height {
-				im = resize.Resize(uint(spec.Width), 0, m, resize.Bilinear)
-			} else {
-				im = resize.Resize(0, uint(spec.Height), m, resize.Bilinear)
-			}
 			if err := saveImage(&im, savePath, 1); err != nil {
-				return err
+				log.Println(savePath, err)
 			}
+			continue
+		}
+	do_scale:
+		// scale it
+		var im image.Image
+		if bounds.Size().X > spec.Width &&
+			bounds.Size().Y*spec.Width/bounds.Size().X < spec.Height {
+			im = resize.Resize(uint(spec.Width), 0, m, resize.Bilinear)
+		} else {
+			im = resize.Resize(0, uint(spec.Height), m, resize.Bilinear)
+		}
+		log.Printf("finally, resized to %d * %d\n", im.Bounds().Size().X, im.Bounds().Size().Y)
+		if err := saveImage(&im, savePath, 1); err != nil {
+			log.Println(savePath, err)
 		}
 	}
 	return nil

@@ -40,9 +40,23 @@ func main() {
 	if len(os.Args) < 2 {
 		log.Fatal(errors.New("Incorrect arguments!"))
 	}
-	args := flag.Args()
+	if scale == true {
+		cut = false
+	}
 
-	if watch {
+	if appicon {
+		fmt.Println("output ios app icons")
+		return
+	}
+
+	if launchimage {
+		fmt.Println("output ios launch images")
+		return
+	}
+
+	// taobao mode
+	args := flag.Args()
+	if watch == true {
 		var err error
 		watcher, err = fsnotify.NewWatcher()
 		if err != nil {
@@ -93,7 +107,9 @@ func main() {
 			}
 		}
 		timer.Stop()
-	} else if cut {
+	}
+
+	if cut == true {
 		for _, root := range args {
 			if b, e := isDir(root); e == nil && b == true {
 				err := filepath.Walk(root, traverseCut)
@@ -105,21 +121,18 @@ func main() {
 				doCutImage(root)
 			}
 		}
-	} else if appicon {
-		fmt.Println("output ios app icons")
-	} else if launchimage {
-		fmt.Println("output ios launch images")
-	} else {
-		for _, root := range args {
-			if b, e := isDir(root); e == nil && b == true {
-				err := filepath.Walk(root, traverseScale)
-				if err != nil {
-					log.Println(err)
-					continue
-				}
-			} else {
-				doScaleImage(root)
+	}
+
+	for _, root := range args {
+		if b, e := isDir(root); e == nil && b == true {
+			err := filepath.Walk(root, traverseScale)
+			if err != nil {
+				log.Println(err)
+				continue
 			}
+		} else {
+			doScaleImage(root)
 		}
 	}
+
 }

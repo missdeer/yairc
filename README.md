@@ -73,6 +73,8 @@ TODO
 
 [NetBSD amd64](https://github.com/missdeer/yairc/raw/prebuilt/yairc-netbsd-amd64)
 
+[NetBSD arm6](https://github.com/missdeer/yairc/raw/prebuilt/yairc-netbsd-arm)
+
 [FreeBSD x86](https://github.com/missdeer/yairc/raw/prebuilt/yairc-freebsd-386)
 
 [FreeBSD amd64](https://github.com/missdeer/yairc/raw/prebuilt/yairc-freebsd-amd64)

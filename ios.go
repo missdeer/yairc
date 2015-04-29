@@ -29,15 +29,15 @@ type AppIconSpec struct {
 
 var (
 	LaunchImageSpecifications = []LaunchImageSpec{
-		{320, 480, "~iphone.png", ScaleCutHandler},
-		{640, 960, "@2x~iphone.png", ScaleCutHandler},
-		{640, 1136, "-568h@2x~iphone.png", ScaleCutHandler},
-		{750, 1334, "-667h@2x~iphone.png", ScaleCutHandler},
-		{1242, 2208, "-736h@3x~iphone.png", ScaleCutHandler},
+		{320, 480, "~iphone.png", PadToPhoneScaleCutHandler},
+		{640, 960, "@2x~iphone.png", PadToPhoneScaleCutHandler},
+		{640, 1136, "-568h@2x~iphone.png", PadToPhoneScaleCutHandler},
+		{750, 1334, "-667h@2x~iphone.png", PadToPhoneScaleCutHandler},
+		{1242, 2208, "-736h@3x~iphone.png", PadToPhoneScaleCutHandler},
 		{768, 1024, "-Portrait~ipad.png", ScaleHandler},
-		{1024, 768, "-Landscape~ipad.png", ScaleCutHandler},
+		{1024, 768, "-Landscape~ipad.png", RotateScaleCutHandler},
 		{1536, 2048, "-Portrait@2x~ipad.png", SkipHandler},
-		{2048, 1536, "-Landscape@2x~ipad.png", ScaleCutHandler},
+		{2048, 1536, "-Landscape@2x~ipad.png", RotateScaleCutHandler},
 	}
 	AppIconSpecifications = []AppIconSpec{
 		{20, "Icon-Small-20.png"},
@@ -88,24 +88,40 @@ func ScaleHandler(m image.Image, savePath string, spec *LaunchImageSpec) error {
 	return nil
 }
 
-func ScaleCutHandler(m image.Image, savePath string, spec *LaunchImageSpec) error {
-	bounds := m.Bounds()
-	var im image.Image
-
-	if bounds.Size().Y*spec.Width/bounds.Size().X < spec.Height {
-		im = resize.Resize(uint(spec.Width), 0, m, resize.Bilinear)
-		log.Println("resize by width")
-	} else {
-		im = resize.Resize(0, uint(spec.Height), m, resize.Bilinear)
-		log.Println("resize by height")
-	}
+func RotateScaleCutHandler(m image.Image, savePath string, spec *LaunchImageSpec) error {
+	im := resize.Resize(uint(spec.Width), 0, m, resize.Bilinear)
+	log.Println("resize by width")
 
 	// if the origin is larger than expected
 	var err error
 	im, err = cutter.Crop(im, cutter.Config{
 		Width:  spec.Width,
 		Height: spec.Height,
-		Anchor: image.Point{(m.Bounds().Size().X - spec.Width) / 2, (m.Bounds().Size().Y - spec.Height) / 2},
+		Anchor: image.Point{0, (im.Bounds().Size().Y - spec.Height) / 2},
+	})
+	log.Printf("cropped to %d * %d\n", im.Bounds().Size().X, im.Bounds().Size().Y)
+
+	if err != nil {
+		log.Println(savePath, err)
+		return err
+	}
+	if err := saveImage(&im, savePath, 1); err != nil {
+		log.Println(savePath, err)
+		return err
+	}
+	return nil
+}
+
+func PadToPhoneScaleCutHandler(m image.Image, savePath string, spec *LaunchImageSpec) error {
+	im := resize.Resize(0, uint(spec.Height), m, resize.Bilinear)
+	log.Println("resize by height")
+
+	// if the origin is larger than expected
+	var err error
+	im, err = cutter.Crop(im, cutter.Config{
+		Width:  spec.Width,
+		Height: spec.Height,
+		Anchor: image.Point{(im.Bounds().Size().X - spec.Width) / 2, 0},
 	})
 	log.Printf("cropped to %d * %d\n", im.Bounds().Size().X, im.Bounds().Size().Y)
 

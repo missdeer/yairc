@@ -8,7 +8,7 @@ YAIRC - Yet Another Image Resizer & Cutter, formerly known as TaobaoMobileImageR
 功能
 ----
 - 生成针对淘宝移动端适配的图片
-- 生成所有尺寸的iOS launch image和app icon
+- 生成所有尺寸的iOS launch image和app icon（WIP）
 
 使用方法
 ----
@@ -27,8 +27,8 @@ YAIRC - Yet Another Image Resizer & Cutter, formerly known as TaobaoMobileImageR
 
 TODO
 ----
-* 支持Android App的launch image生成
-* 也许支持iOS/Android App的app icon生成
+* 支持Android App的splash image生成
+* 也许支持Android App的app icon生成
 
 预编译包下载
 ----

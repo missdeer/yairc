@@ -18,20 +18,24 @@ const (
 )
 
 var (
-	watcher        *fsnotify.Watcher
-	cut            bool
-	scale          bool
-	appicon        bool
-	launchimage    bool
-	watch          bool
-	imagedirectory string
+	watcher              *fsnotify.Watcher
+	cut                  bool
+	scale                bool
+	ios_appicon          bool
+	ios_launchimage      bool
+	android_launchericon bool
+	android_splash       bool
+	watch                bool
+	imagedirectory       string
 )
 
 func init() {
 	flag.BoolVarP(&cut, "cut", "c", true, "cut mode")
 	flag.BoolVarP(&scale, "scale", "s", false, "scale mode")
-	flag.BoolVarP(&appicon, "appicon", "a", false, "generate ios app icon")
-	flag.BoolVarP(&launchimage, "launchimage", "l", false, "generate ios launch images")
+	flag.BoolVarP(&ios_appicon, "appicon", "a", false, "generate ios app icons")
+	flag.BoolVarP(&ios_launchimage, "launchimage", "l", false, "generate ios launch images")
+	flag.BoolVarP(&android_launchericon, "launchericon", "u", false, "generate android launcher icons")
+	flag.BoolVarP(&android_splash, "splashscreen", "r", false, "generate android splash screen images")
 	flag.BoolVarP(&watch, "watch", "w", false, "watch directories change")
 }
 
@@ -44,7 +48,7 @@ func main() {
 	args := flag.Args()
 
 	// ios app icon mode
-	if appicon == true {
+	if ios_appicon == true {
 		fmt.Println("output ios app icons")
 		for _, root := range args {
 			GenerateAppIcon(root)
@@ -53,12 +57,27 @@ func main() {
 	}
 
 	// ios launch image mode
-	if launchimage == true {
+	if ios_launchimage == true {
 		fmt.Println("output ios launch images")
 		for _, root := range args {
 			GenerateLaunchImage(root)
 		}
 		return
+	}
+
+	if android_launchericon == true {
+		fmt.Println("output android launcher icons")
+		for _, root := range args {
+			GenerateLauncherIcon(root)
+		}
+		return
+	}
+
+	if android_splash == true {
+		fmt.Println("output android splash screen images")
+		for _, root := range args {
+			GenerateSplashScreen(root)
+		}
 	}
 
 	// taobao mode

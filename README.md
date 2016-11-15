@@ -1,7 +1,7 @@
 YAIRC - Yet Another Image Resizer & Cutter, formerly known as TaobaoMobileImageResizer
 ========================
 
-[![Build Status](https://secure.travis-ci.org/missdeer/yairc.png)](https://travis-ci.org/missdeer/yairc)
+[![Build Status](https://secure.travis-ci.org/dfordsoft/yairc.png)](https://travis-ci.org/dfordsoft/yairc)
 
 =======
 
@@ -33,7 +33,7 @@ YAIRC - Yet Another Image Resizer & Cutter, formerly known as TaobaoMobileImageR
 ./yairc -c filename1 [filename2 filename3 ...]
 ./yairc -c directory1 [directory2 directory3 ...]
 ```
-	
+
 ####生成iOS launch images：准备一个1536＊2048大小的图片模板template.png
 
 ```bash
@@ -51,43 +51,3 @@ TODO
 ----
 * 支持Android App的splash image生成
 * 支持Android App的app icon生成
-
-预编译包下载
-----
-
-下载不同平台对应的可执行文件（推荐）：
-
-[Darwin x86](https://github.com/missdeer/yairc/raw/prebuilt/yairc-darwin-386)
-
-[Darwin amd64](https://github.com/missdeer/yairc/raw/prebuilt/yairc-darwin-amd64)
-
-[DragonflyBSD x86](https://github.com/missdeer/yairc/raw/prebuilt/yairc-dragonfly-386)
-
-[DragonflyBSD amd64](https://github.com/missdeer/yairc/raw/prebuilt/yairc-dragonfly-amd64)
-
-[OpenBSD x86](https://github.com/missdeer/yairc/raw/prebuilt/yairc-openbsd-386)
-
-[OpenBSD amd64](https://github.com/missdeer/yairc/raw/prebuilt/yairc-openbsd-amd64)
-
-[NetBSD x86](https://github.com/missdeer/yairc/raw/prebuilt/yairc-netbsd-386)
-
-[NetBSD amd64](https://github.com/missdeer/yairc/raw/prebuilt/yairc-netbsd-amd64)
-
-[NetBSD arm6](https://github.com/missdeer/yairc/raw/prebuilt/yairc-netbsd-arm)
-
-[FreeBSD x86](https://github.com/missdeer/yairc/raw/prebuilt/yairc-freebsd-386)
-
-[FreeBSD amd64](https://github.com/missdeer/yairc/raw/prebuilt/yairc-freebsd-amd64)
-
-[FreeBSD arm6](https://github.com/missdeer/yairc/raw/prebuilt/yairc-freebsd-arm)
-
-[Linux x86](https://github.com/missdeer/yairc/raw/prebuilt/yairc-linux-386)
-
-[Linux amd64](https://github.com/missdeer/yairc/raw/prebuilt/yairc-linux-amd64)
-
-[Linux arm6](https://github.com/missdeer/yairc/raw/prebuilt/yairc-linux-arm)
-
-[Windows x86](https://github.com/missdeer/yairc/raw/prebuilt/yairc-windows-386), 下载后将文件名添加后缀.exe
-
-[Windows amd64](https://github.com/missdeer/yairc/raw/prebuilt/yairc-windows-amd64),下载后将文件名添加后缀.exe 
-

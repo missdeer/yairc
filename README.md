@@ -5,6 +5,10 @@ YAIRC - Yet Another Image Resizer & Cutter, formerly known as TaobaoMobileImageR
 
 =======
 
+编译
+----
+`go get github.com/dfordsoft/yairc`
+
 功能
 ----
 - 生成针对淘宝移动端适配的图片

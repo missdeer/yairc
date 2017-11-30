@@ -19,20 +19,24 @@ const (
 )
 
 var (
-	watcher             *fsnotify.Watcher
-	cut                 bool
-	scale               bool
-	iosAppIcon          bool
-	iosLaunchImage      bool
-	androidLauncherIcon bool
-	androidSplash       bool
-	watch               bool
-	imagedirectory      string
+	watcher              *fsnotify.Watcher
+	cut                  bool
+	scale                bool
+	iosScale             bool
+	iosScaleTemplateSize string
+	iosAppIcon           bool
+	iosLaunchImage       bool
+	androidLauncherIcon  bool
+	androidSplash        bool
+	watch                bool
+	imagedirectory       string
 )
 
 func main() {
 	flag.BoolVarP(&cut, "cut", "c", true, "cut mode")
 	flag.BoolVarP(&scale, "scale", "s", false, "scale mode")
+	flag.BoolVarP(&iosScale, "iosscale", "i", false, "generate @1x/@2x/@3x images for iOS")
+	flag.StringVarP(&iosScaleTemplateSize, "as", "", "1x", "iOS scale mode template size, can be 1x/2x/3x")
 	flag.BoolVarP(&iosAppIcon, "appicon", "a", false, "generate ios app icons")
 	flag.BoolVarP(&iosLaunchImage, "launchimage", "l", false, "generate ios launch images")
 	flag.BoolVarP(&androidLauncherIcon, "launchericon", "u", false, "generate android launcher icons")
@@ -44,6 +48,15 @@ func main() {
 	}
 	cut = !scale
 	args := flag.Args()
+
+	// ios scale Mode
+	if iosScale == true {
+		fmt.Println("generate @1x/@2x/@3x images for iOS")
+		for _, root := range args {
+			iOSScale(root, iosScaleTemplateSize)
+		}
+		return
+	}
 
 	// ios app icon mode
 	if iosAppIcon == true {

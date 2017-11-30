@@ -1,8 +1,6 @@
 package main
 
 import (
-	"github.com/nfnt/resize"
-	"github.com/oliamb/cutter"
 	"image"
 	_ "image/gif"
 	_ "image/jpeg"
@@ -11,24 +9,27 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/nfnt/resize"
+	"github.com/oliamb/cutter"
 )
 
-type handler func(image.Image, string, *LaunchImageSpec) error
+type handler func(image.Image, string, *launchImageSpec) error
 
-type LaunchImageSpec struct {
+type launchImageSpec struct {
 	Width   int
 	Height  int
 	Postfix string
 	Handler handler
 }
 
-type AppIconSpec struct {
+type appIconSpec struct {
 	Length int
 	Name   string
 }
 
 var (
-	LaunchImageSpecifications = []LaunchImageSpec{
+	launchImageSpecifications = []launchImageSpec{
 		{320, 480, "~iphone.png", PadToPhoneScaleCutHandler},
 		{640, 960, "@2x~iphone.png", PadToPhoneScaleCutHandler},
 		{640, 1136, "-568h@2x~iphone.png", PadToPhoneScaleCutHandler},
@@ -39,7 +40,7 @@ var (
 		{1536, 2048, "-Portrait@2x~ipad.png", SkipHandler},
 		{2048, 1536, "-Landscape@2x~ipad.png", RotateScaleCutHandler},
 	}
-	AppIconSpecifications = []AppIconSpec{
+	appIconSpecifications = []appIconSpec{
 		{20, "Icon-Small-20.png"},
 		{29, "Icon-29.png"},
 		{29, "Icon-Small.png"},
@@ -70,7 +71,7 @@ var (
 	}
 )
 
-func ScaleHandler(m image.Image, savePath string, spec *LaunchImageSpec) error {
+func ScaleHandler(m image.Image, savePath string, spec *launchImageSpec) error {
 	bounds := m.Bounds()
 	var im image.Image
 
@@ -88,7 +89,7 @@ func ScaleHandler(m image.Image, savePath string, spec *LaunchImageSpec) error {
 	return nil
 }
 
-func RotateScaleCutHandler(m image.Image, savePath string, spec *LaunchImageSpec) error {
+func RotateScaleCutHandler(m image.Image, savePath string, spec *launchImageSpec) error {
 	im := resize.Resize(uint(spec.Width), 0, m, resize.Bilinear)
 	log.Println("resize by width")
 
@@ -112,7 +113,7 @@ func RotateScaleCutHandler(m image.Image, savePath string, spec *LaunchImageSpec
 	return nil
 }
 
-func PadToPhoneScaleCutHandler(m image.Image, savePath string, spec *LaunchImageSpec) error {
+func PadToPhoneScaleCutHandler(m image.Image, savePath string, spec *launchImageSpec) error {
 	im := resize.Resize(0, uint(spec.Height), m, resize.Bilinear)
 	log.Println("resize by height")
 
@@ -136,7 +137,7 @@ func PadToPhoneScaleCutHandler(m image.Image, savePath string, spec *LaunchImage
 	return nil
 }
 
-func SkipHandler(m image.Image, savePath string, spec *LaunchImageSpec) error {
+func SkipHandler(m image.Image, savePath string, spec *launchImageSpec) error {
 	if err := saveImage(&m, savePath, 1); err != nil {
 		log.Println(savePath, err)
 	}
@@ -159,7 +160,7 @@ func GenerateLaunchImage(origin string) error {
 	base := filepath.Base(origin)
 	base = base[:strings.Index(base, ".")]
 
-	for _, spec := range LaunchImageSpecifications {
+	for _, spec := range launchImageSpecifications {
 		savePath := base + spec.Postfix
 
 		log.Println("generating ", savePath)
@@ -181,11 +182,112 @@ func GenerateAppIcon(origin string) error {
 		return err
 	}
 
-	for _, spec := range AppIconSpecifications {
+	for _, spec := range appIconSpecifications {
 		im := resize.Resize(uint(spec.Length), uint(spec.Length), m, resize.Bilinear)
 		if err := saveImage(&im, spec.Name, 1); err != nil {
 			log.Println(spec.Name, err)
 		}
 	}
+	return nil
+}
+
+func iOSScale(origin string, templateSize string) error {
+	switch templateSize {
+	case "1x":
+		reader, err := os.Open(origin)
+		if err != nil {
+			log.Println(origin, err)
+			return err
+		}
+		defer reader.Close()
+		m, _, err := image.Decode(reader)
+		if err != nil {
+			log.Println(origin, err)
+			return err
+		}
+
+		name := filepath.Dir(origin) + string(filepath.Separator) + filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))] + "@2x" + filepath.Ext(origin)
+		im := resize.Resize(uint(m.Bounds().Size().X*2), uint(m.Bounds().Size().Y*2), m, resize.Bilinear)
+		if err := saveImage(&im, name, 1); err != nil {
+			log.Println(name, err)
+		}
+
+		name = filepath.Dir(origin) + string(filepath.Separator) + filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))] + "@3x" + filepath.Ext(origin)
+		im = resize.Resize(uint(m.Bounds().Size().X*3), uint(m.Bounds().Size().Y*3), m, resize.Bilinear)
+		if err := saveImage(&im, name, 1); err != nil {
+			log.Println(name, err)
+		}
+	case "2x":
+		var one, two, three string
+		if !strings.HasSuffix(filepath.Base(origin), "@2x") {
+			one = origin
+			two = filepath.Dir(origin) + string(filepath.Separator) + filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))] + "@2x" + filepath.Ext(origin)
+			three = filepath.Dir(origin) + string(filepath.Separator) + filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))] + "@3x" + filepath.Ext(origin)
+			os.Rename(origin, two)
+		} else {
+			one = filepath.Dir(origin) + string(filepath.Separator) + filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))-3] + filepath.Ext(origin)
+			two = origin
+			three = filepath.Dir(origin) + string(filepath.Separator) + filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))-3] + "@3x" + filepath.Ext(origin)
+		}
+
+		reader, err := os.Open(two)
+		if err != nil {
+			log.Println(two, err)
+			return err
+		}
+		defer reader.Close()
+		m, _, err := image.Decode(reader)
+		if err != nil {
+			log.Println(two, err)
+			return err
+		}
+
+		im := resize.Resize(uint(m.Bounds().Size().X/2), uint(m.Bounds().Size().Y/2), m, resize.Bilinear)
+		if err := saveImage(&im, one, 1); err != nil {
+			log.Println(one, err)
+		}
+
+		im = resize.Resize(uint(m.Bounds().Size().X*3/2), uint(m.Bounds().Size().Y*3/2), m, resize.Bilinear)
+		if err := saveImage(&im, three, 1); err != nil {
+			log.Println(three, err)
+		}
+	case "3x":
+		var one, two, three string
+		if !strings.HasSuffix(filepath.Base(origin), "@3x") {
+			one = origin
+			two = filepath.Dir(origin) + string(filepath.Separator) + filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))] + "@2x" + filepath.Ext(origin)
+			three = filepath.Dir(origin) + string(filepath.Separator) + filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))] + "@3x" + filepath.Ext(origin)
+			os.Rename(origin, three)
+		} else {
+			one = filepath.Dir(origin) + string(filepath.Separator) + filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))-3] + filepath.Ext(origin)
+			two = filepath.Dir(origin) + string(filepath.Separator) + filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))-3] + "@2x" + filepath.Ext(origin)
+			three = origin
+		}
+
+		reader, err := os.Open(three)
+		if err != nil {
+			log.Println(three, err)
+			return err
+		}
+		defer reader.Close()
+		m, _, err := image.Decode(reader)
+		if err != nil {
+			log.Println(three, err)
+			return err
+		}
+
+		im := resize.Resize(uint(m.Bounds().Size().X/3), uint(m.Bounds().Size().Y/3), m, resize.Bilinear)
+		if err := saveImage(&im, one, 1); err != nil {
+			log.Println(one, err)
+		}
+
+		im = resize.Resize(uint(m.Bounds().Size().X*2/3), uint(m.Bounds().Size().Y*2/3), m, resize.Bilinear)
+		if err := saveImage(&im, two, 1); err != nil {
+			log.Println(two, err)
+		}
+	default:
+		log.Fatal("unrecognized template size")
+	}
+
 	return nil
 }

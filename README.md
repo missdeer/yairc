@@ -50,6 +50,11 @@ YAIRC - Yet Another Image Resizer & Cutter, formerly known as TaobaoMobileImageR
 ./yairc -a template.png
 ```
 
+#### 生成iOS app所需要的3倍图片文件：准备好图片文件template.png
+
+```bash
+./yairc -i --as=2x template.png
+```
 
 TODO
 ----

@@ -1,12 +1,72 @@
 language: go
 go:
-- 1.7.3
 - tip
-script:
-- go build .
 env:
   global:
   - GITHUB_REPO: dfordsoft/yairc
   - GIT_NAME: missdeer
   - GIT_EMAIL: missdeer@dfordsoft.com
   - secure: Putn2dfCb7wEXFZ5yF/TFo8HHiyIGf7b80C5lJHB4YTKxKBic8xOd3v6IhVfXNZgHSvuA+TVDI9VQJ9eRviJalCVN1qP88oLlrj4/q1WeF9DDUxpTPHV1uP/z6F8s0nmyICRFPs7Gq0fUyfZae+DgF0uaZT+6VxDksjg25eYFFQ=
+deploy:
+  provider: releases
+  api_key:
+    secure: KsjKdjAjQef5QAVCmcxGcxYxtdXTHtCFxP9zzMLcU+rLQDiQxbFvzoOw6L+b+CCj4fvVuHvC1Ib+a08ct8ZEsKwE/e0UWBIlx8+Gym2EJAbFHD1GXvKpL5Cn3UqO7KdEx0dXk8WORQLpsPxuWTlGycRBVmT0EdYhPnLBRPbghDQ=
+  file:
+    - yairc-darwin-amd64.tar.gz
+    - yairc-dragonflybsd-amd64.tar.gz
+    - yairc-freebsd-amd64.tar.gz
+    - yairc-freebsd-arm.tar.gz
+    - yairc-freebsd-x86.tar.gz
+    - yairc-linux-amd64.tar.gz
+    - yairc-linux-arm64.tar.gz
+    - yairc-linux-armv6.tar.gz
+    - yairc-linux-armv7.tar.gz
+    - yairc-linux-mips64.tar.gz
+    - yairc-linux-mips64le.tar.gz
+    - yairc-linux-mips.tar.gz
+    - yairc-linux-mipsle.tar.gz
+    - yairc-linux-ppc64.tar.gz
+    - yairc-linux-ppc64le.tar.gz
+    - yairc-linux-x86.tar.gz
+    - yairc-netbsd-amd64.tar.gz
+    - yairc-netbsd-arm.tar.gz
+    - yairc-netbsd-x86.tar.gz
+    - yairc-openbsd-amd64.tar.gz
+    - yairc-openbsd-x86.tar.gz
+    - yairc-solaris-amd64.tar.gz
+    - yairc-windows-amd64.tar.gz
+    - yairc-windows-x86.tar.gz
+  on:
+    repo: dfordsoft/yairc
+    tags: true
+  skip_cleanup: true
+install:
+  - go get github.com/dfordsoft/yairc
+script:
+  - pwd && ls -l
+  - env GOARCH=amd64 GOOS=linux go build -ldflags="-s -w"  && tar czvf yairc-linux-amd64.tar.gz yairc
+  - env GOARCH=386 GOOS=linux go build -ldflags="-s -w"  && tar czvf yairc-linux-x86.tar.gz yairc
+  - env GOARCH=arm GOARM=5 GOOS=linux go build -ldflags="-s -w"  && tar czvf yairc-linux-armv5.tar.gz yairc
+  - env GOARCH=arm GOARM=6 GOOS=linux go build -ldflags="-s -w"  && tar czvf yairc-linux-armv6.tar.gz yairc
+  - env GOARCH=arm GOARM=7 GOOS=linux go build -ldflags="-s -w"  && tar czvf yairc-linux-armv7.tar.gz yairc
+  - env GOARCH=arm64 GOOS=linux go build -ldflags="-s -w"  && tar czvf yairc-linux-arm64.tar.gz yairc
+  - env GOARCH=ppc64 GOOS=linux go build -ldflags="-s -w"  && tar czvf yairc-linux-ppc64.tar.gz yairc
+  - env GOARCH=ppc64le GOOS=linux go build -ldflags="-s -w"  && tar czvf yairc-linux-ppc64le.tar.gz yairc
+  - env GOARCH=mips64 GOOS=linux go build -ldflags="-s -w"  && tar czvf yairc-linux-mips64.tar.gz yairc
+  - env GOARCH=mips64le GOOS=linux go build -ldflags="-s -w"  && tar czvf yairc-linux-mips64le.tar.gz yairc
+  - env GOARCH=mips GOOS=linux go build -ldflags="-s -w"  && tar czvf yairc-linux-mips.tar.gz yairc
+  - env GOARCH=mipsle GOOS=linux go build -ldflags="-s -w"  && tar czvf yairc-linux-mipsle.tar.gz yairc
+  - env GOARCH=amd64 GOOS=darwin go build  && tar czvf yairc-darwin-amd64.tar.gz yairc
+  - env GOARCH=amd64 GOOS=windows go build  && tar czvf yairc-windows-amd64.tar.gz yairc.exe
+  - env GOARCH=386 GOOS=windows go build  && tar czvf yairc-windows-x86.tar.gz yairc.exe
+  - env GOARCH=amd64 GOOS=freebsd go build  && tar czvf yairc-freebsd-amd64.tar.gz yairc
+  - env GOARCH=386 GOOS=freebsd go build  && tar czvf yairc-freebsd-x86.tar.gz yairc
+  - env GOARCH=arm GOOS=freebsd go build  && tar czvf yairc-freebsd-arm.tar.gz yairc
+  - env GOARCH=amd64 GOOS=openbsd go build  && tar czvf yairc-openbsd-amd64.tar.gz yairc
+  - env GOARCH=386 GOOS=openbsd go build  && tar czvf yairc-openbsd-x86.tar.gz yairc
+  - env GOARCH=amd64 GOOS=netbsd go build  && tar czvf yairc-netbsd-amd64.tar.gz yairc
+  - env GOARCH=386 GOOS=netbsd go build  && tar czvf yairc-netbsd-x86.tar.gz yairc
+  - env GOARCH=arm GOOS=netbsd go build  && tar czvf yairc-netbsd-arm.tar.gz yairc
+  - env GOARCH=amd64 GOOS=dragonfly go build  && tar czvf yairc-dragonflybsd-amd64.tar.gz yairc
+  - env GOARCH=amd64 GOOS=solaris go build  && tar czvf yairc-solaris-amd64.tar.gz yairc
+  - ls -l

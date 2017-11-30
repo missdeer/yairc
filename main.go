@@ -3,13 +3,14 @@ package main
 import (
 	"errors"
 	"fmt"
-	"github.com/go-fsnotify/fsnotify"
-	flag "github.com/ogier/pflag"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/go-fsnotify/fsnotify"
+	flag "github.com/ogier/pflag"
 )
 
 const (
@@ -18,37 +19,34 @@ const (
 )
 
 var (
-	watcher              *fsnotify.Watcher
-	cut                  bool
-	scale                bool
-	ios_appicon          bool
-	ios_launchimage      bool
-	android_launchericon bool
-	android_splash       bool
-	watch                bool
-	imagedirectory       string
+	watcher             *fsnotify.Watcher
+	cut                 bool
+	scale               bool
+	iosAppIcon          bool
+	iosLaunchImage      bool
+	androidLauncherIcon bool
+	androidSplash       bool
+	watch               bool
+	imagedirectory      string
 )
 
-func init() {
+func main() {
 	flag.BoolVarP(&cut, "cut", "c", true, "cut mode")
 	flag.BoolVarP(&scale, "scale", "s", false, "scale mode")
-	flag.BoolVarP(&ios_appicon, "appicon", "a", false, "generate ios app icons")
-	flag.BoolVarP(&ios_launchimage, "launchimage", "l", false, "generate ios launch images")
-	flag.BoolVarP(&android_launchericon, "launchericon", "u", false, "generate android launcher icons")
-	flag.BoolVarP(&android_splash, "splashscreen", "r", false, "generate android splash screen images")
+	flag.BoolVarP(&iosAppIcon, "appicon", "a", false, "generate ios app icons")
+	flag.BoolVarP(&iosLaunchImage, "launchimage", "l", false, "generate ios launch images")
+	flag.BoolVarP(&androidLauncherIcon, "launchericon", "u", false, "generate android launcher icons")
+	flag.BoolVarP(&androidSplash, "splashscreen", "r", false, "generate android splash screen images")
 	flag.BoolVarP(&watch, "watch", "w", false, "watch directories change")
-}
-
-func main() {
 	flag.Parse()
 	if len(os.Args) < 2 {
-		log.Fatal(errors.New("Incorrect arguments! Use --help to get the usage."))
+		log.Fatal("Incorrect arguments! Use --help to get the usage.")
 	}
 	cut = !scale
 	args := flag.Args()
 
 	// ios app icon mode
-	if ios_appicon == true {
+	if iosAppIcon == true {
 		fmt.Println("output ios app icons")
 		for _, root := range args {
 			GenerateAppIcon(root)
@@ -57,7 +55,7 @@ func main() {
 	}
 
 	// ios launch image mode
-	if ios_launchimage == true {
+	if iosLaunchImage == true {
 		fmt.Println("output ios launch images")
 		for _, root := range args {
 			GenerateLaunchImage(root)
@@ -65,7 +63,7 @@ func main() {
 		return
 	}
 
-	if android_launchericon == true {
+	if androidLauncherIcon == true {
 		fmt.Println("output android launcher icons")
 		for _, root := range args {
 			GenerateLauncherIcon(root)
@@ -73,7 +71,7 @@ func main() {
 		return
 	}
 
-	if android_splash == true {
+	if androidSplash == true {
 		fmt.Println("output android splash screen images")
 		for _, root := range args {
 			GenerateSplashScreen(root)

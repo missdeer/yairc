@@ -2,6 +2,7 @@ package main
 
 import (
 	"image"
+	"image/draw"
 	_ "image/gif"
 	_ "image/jpeg"
 	_ "image/png"
@@ -14,7 +15,7 @@ import (
 	"github.com/oliamb/cutter"
 )
 
-type handler func(image.Image, string, *launchImageSpec) error
+type handler func(image.Image, image.Image, string, *launchImageSpec) error
 
 type launchImageSpec struct {
 	Width   int
@@ -30,15 +31,21 @@ type appIconSpec struct {
 
 var (
 	launchImageSpecifications = []launchImageSpec{
-		{320, 480, "~iphone.png", PadToPhoneScaleCutHandler},
-		{640, 960, "@2x~iphone.png", PadToPhoneScaleCutHandler},
-		{640, 1136, "-568h@2x~iphone.png", PadToPhoneScaleCutHandler},
-		{750, 1334, "-667h@2x~iphone.png", PadToPhoneScaleCutHandler},
-		{1242, 2208, "-736h@3x~iphone.png", PadToPhoneScaleCutHandler},
-		{768, 1024, "-Portrait~ipad.png", ScaleHandler},
-		{1024, 768, "-Landscape~ipad.png", RotateScaleCutHandler},
-		{1536, 2048, "-Portrait@2x~ipad.png", SkipHandler},
-		{2048, 1536, "-Landscape@2x~ipad.png", RotateScaleCutHandler},
+		{640, 960, "Default@2x~iphone.png", BackgroundForegroundHandler},
+		{640, 1136, "Default-568h@2x~iphone.png", BackgroundForegroundHandler},
+		{1136, 640, "Default-Landscape-568h@2x~iphone.png", BackgroundForegroundHandler},
+		{750, 1334, "Default-667h@2x~iphone.png", BackgroundForegroundHandler},
+		{1334, 750, "Default-Landscape-667h@2x~iphone.png", BackgroundForegroundHandler},
+		{1242, 2208, "Default-736h@3x~iphone.png", BackgroundForegroundHandler},
+		{2208, 1242, "Default-Landscape-736h@3x~iphone.png", BackgroundForegroundHandler},
+		{768, 1024, "Default-Portrait~ipad.png", BackgroundForegroundHandler},
+		{1024, 768, "Default-Landscape~ipad.png", BackgroundForegroundHandler},
+		{1536, 2048, "Default-Portrait@2x~ipad.png", BackgroundForegroundHandler},
+		{2048, 1536, "Default-Landscape@2x~ipad.png", BackgroundForegroundHandler},
+		{1668, 2224, "Default-Portrait-1112@2x~ipad.png", BackgroundForegroundHandler},
+		{2224, 1668, "Default-Landscape-1112@2x~ipad.png", BackgroundForegroundHandler},
+		{2048, 2732, "Default-Portrait-1366@2x~ipad.png", BackgroundForegroundHandler},
+		{2732, 2048, "Default-Landscape-1366@2x~ipad.png", BackgroundForegroundHandler},
 	}
 	appIconSpecifications = []appIconSpec{
 		{20, "Icon-Small-20.png"},
@@ -71,100 +78,88 @@ var (
 	}
 )
 
-func ScaleHandler(m image.Image, savePath string, spec *launchImageSpec) error {
-	bounds := m.Bounds()
-	var im image.Image
-
-	if bounds.Size().Y*spec.Width/bounds.Size().X < spec.Height {
-		im = resize.Resize(uint(spec.Width), 0, m, resize.Bilinear)
+func BackgroundForegroundHandler(bm image.Image, fm image.Image, savePath string, spec *launchImageSpec) error {
+	im := resize.Resize(0, uint(spec.Height), bm, resize.Bilinear)
+	if im.Bounds().Size().X < spec.Width {
+		im = resize.Resize(uint(spec.Width), 0, bm, resize.Bilinear)
 		log.Println("resize by width")
 	} else {
-		im = resize.Resize(0, uint(spec.Height), m, resize.Bilinear)
 		log.Println("resize by height")
 	}
 
-	if err := saveImage(&im, savePath, 1); err != nil {
-		log.Println(savePath, err)
-	}
-	return nil
-}
-
-func RotateScaleCutHandler(m image.Image, savePath string, spec *launchImageSpec) error {
-	im := resize.Resize(uint(spec.Width), 0, m, resize.Bilinear)
-	log.Println("resize by width")
-
-	// if the origin is larger than expected
 	var err error
-	im, err = cutter.Crop(im, cutter.Config{
-		Width:  spec.Width,
-		Height: spec.Height,
-		Anchor: image.Point{0, (im.Bounds().Size().Y - spec.Height) / 2},
-	})
-	log.Printf("cropped to %d * %d\n", im.Bounds().Size().X, im.Bounds().Size().Y)
-
-	if err != nil {
-		log.Println(savePath, err)
-		return err
+	if im.Bounds().Size().X > spec.Width {
+		im, err = cutter.Crop(im, cutter.Config{
+			Width:  spec.Width,
+			Height: spec.Height,
+			Anchor: image.Point{(im.Bounds().Size().X - spec.Width) / 2, 0},
+		})
+		if err != nil {
+			log.Println(savePath, err)
+		}
 	}
-	if err := saveImage(&im, savePath, 1); err != nil {
-		log.Println(savePath, err)
-		return err
+	if im.Bounds().Size().Y > spec.Height {
+		im, err = cutter.Crop(im, cutter.Config{
+			Width:  spec.Width,
+			Height: spec.Height,
+			Anchor: image.Point{0, (im.Bounds().Size().Y - spec.Height) / 2},
+		})
+		if err != nil {
+			log.Println(savePath, err)
+		}
 	}
-	return nil
-}
 
-func PadToPhoneScaleCutHandler(m image.Image, savePath string, spec *launchImageSpec) error {
-	im := resize.Resize(0, uint(spec.Height), m, resize.Bilinear)
-	log.Println("resize by height")
-
-	// if the origin is larger than expected
-	var err error
-	im, err = cutter.Crop(im, cutter.Config{
-		Width:  spec.Width,
-		Height: spec.Height,
-		Anchor: image.Point{(im.Bounds().Size().X - spec.Width) / 2, 0},
-	})
-	log.Printf("cropped to %d * %d\n", im.Bounds().Size().X, im.Bounds().Size().Y)
-
-	if err != nil {
-		log.Println(savePath, err)
-		return err
+	m := image.NewRGBA(image.Rect(0, 0, spec.Width, spec.Height))
+	draw.Draw(m, m.Bounds(), im, im.Bounds().Min, draw.Src)
+	if spec.Width < spec.Height {
+		x := spec.Width / 4
+		y := spec.Height/2 - x
+		sm := resize.Resize(uint(x*2), 0, fm, resize.Bilinear)
+		draw.Draw(m, image.Rect(x, y, x*3, y+x*2), sm, image.Point{0, 0}, draw.Over)
+	} else {
+		y := spec.Height / 4
+		x := spec.Width/2 - y
+		sm := resize.Resize(0, uint(y*2), fm, resize.Bilinear)
+		draw.Draw(m, image.Rect(x, y, x+y*2, y*3), sm, image.Point{0, 0}, draw.Over)
 	}
-	if err := saveImage(&im, savePath, 1); err != nil {
-		log.Println(savePath, err)
-		return err
-	}
-	return nil
-}
 
-func SkipHandler(m image.Image, savePath string, spec *launchImageSpec) error {
-	if err := saveImage(&m, savePath, 1); err != nil {
+	if err = saveRGBA(m, savePath, 1); err != nil {
 		log.Println(savePath, err)
 	}
 	return nil
 }
 
-func GenerateLaunchImage(origin string) error {
-	reader, err := os.Open(origin)
+func GenerateLaunchImage() error {
+	reader, err := os.Open(backgroundImagePath)
 	if err != nil {
-		log.Println(origin, err)
+		log.Println(backgroundImagePath, err)
 		return err
 	}
 	defer reader.Close()
-	m, _, err := image.Decode(reader)
+	bm, _, err := image.Decode(reader)
 	if err != nil {
-		log.Println(origin, err)
+		log.Println(backgroundImagePath, err)
 		return err
 	}
 
-	base := filepath.Base(origin)
-	base = base[:strings.Index(base, ".")]
+	reader, err = os.Open(foregroundImagePath)
+	if err != nil {
+		log.Println(foregroundImagePath, err)
+		return err
+	}
+	defer reader.Close()
+	fm, _, err := image.Decode(reader)
+	if err != nil {
+		log.Println(foregroundImagePath, err)
+		return err
+	}
 
+	os.Mkdir("LaunchImage", 0755)
 	for _, spec := range launchImageSpecifications {
-		savePath := base + spec.Postfix
+		savePath := "LaunchImage/" + spec.Postfix
 
 		log.Println("generating ", savePath)
-		spec.Handler(m, savePath, &spec)
+		spec.Handler(bm, fm, savePath, &spec)
 	}
 	return nil
 }

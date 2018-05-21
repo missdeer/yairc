@@ -30,6 +30,8 @@ var (
 	androidSplash        bool
 	watch                bool
 	imagedirectory       string
+	backgroundImagePath  string
+	foregroundImagePath  string
 )
 
 func main() {
@@ -42,6 +44,8 @@ func main() {
 	flag.BoolVarP(&androidLauncherIcon, "launchericon", "u", false, "generate android launcher icons")
 	flag.BoolVarP(&androidSplash, "splashscreen", "r", false, "generate android splash screen images")
 	flag.BoolVarP(&watch, "watch", "w", false, "watch directories change")
+	flag.StringVarP(&backgroundImagePath, "background", "b", "", "path of background image for launch image")
+	flag.StringVarP(&foregroundImagePath, "foreground", "f", "", "path of foreground image for launch image")
 	flag.Parse()
 	if len(os.Args) < 2 {
 		log.Fatal("Incorrect arguments! Use --help to get the usage.")
@@ -69,10 +73,7 @@ func main() {
 
 	// ios launch image mode
 	if iosLaunchImage == true {
-		fmt.Println("output ios launch images")
-		for _, root := range args {
-			GenerateLaunchImage(root)
-		}
+		GenerateLaunchImage()
 		return
 	}
 

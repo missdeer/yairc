@@ -52,6 +52,29 @@ func isDir(path string) (bool, error) {
 	return fi.IsDir(), nil
 }
 
+func saveRGBA(rgba *image.RGBA, savePath string, imagetype int) (err error) {
+	var file *os.File
+	if f, err := os.OpenFile(savePath, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0644); err != nil {
+		log.Fatal(savePath, err)
+	} else {
+		file = f
+	}
+	defer file.Close()
+
+	switch imagetype {
+	case 1:
+		err = png.Encode(file, rgba)
+	default:
+		err = jpeg.Encode(file, rgba, &jpeg.Options{100})
+	}
+
+	if err != nil {
+		log.Println(savePath, err)
+		return err
+	}
+	return nil
+}
+
 func saveImage(img *image.Image, savePath string, imagetype int) (err error) {
 	var file *os.File
 	if f, err := os.OpenFile(savePath, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0644); err != nil {

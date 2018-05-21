@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-fsnotify/fsnotify"
+	"github.com/fsnotify/fsnotify"
 	flag "github.com/ogier/pflag"
 )
 

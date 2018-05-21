@@ -31,48 +31,42 @@ type appIconSpec struct {
 
 var (
 	launchImageSpecifications = []launchImageSpec{
-		{640, 960, "Default@2x~iphone.png", BackgroundForegroundHandler},
-		{640, 1136, "Default-568h@2x~iphone.png", BackgroundForegroundHandler},
-		{1136, 640, "Default-Landscape-568h@2x~iphone.png", BackgroundForegroundHandler},
-		{750, 1334, "Default-667h@2x~iphone.png", BackgroundForegroundHandler},
-		{1334, 750, "Default-Landscape-667h@2x~iphone.png", BackgroundForegroundHandler},
-		{1242, 2208, "Default-736h@3x~iphone.png", BackgroundForegroundHandler},
-		{2208, 1242, "Default-Landscape-736h@3x~iphone.png", BackgroundForegroundHandler},
-		{768, 1024, "Default-Portrait~ipad.png", BackgroundForegroundHandler},
-		{1024, 768, "Default-Landscape~ipad.png", BackgroundForegroundHandler},
-		{1536, 2048, "Default-Portrait@2x~ipad.png", BackgroundForegroundHandler},
-		{2048, 1536, "Default-Landscape@2x~ipad.png", BackgroundForegroundHandler},
-		{1668, 2224, "Default-Portrait-1112@2x~ipad.png", BackgroundForegroundHandler},
-		{2224, 1668, "Default-Landscape-1112@2x~ipad.png", BackgroundForegroundHandler},
-		{2048, 2732, "Default-Portrait-1366@2x~ipad.png", BackgroundForegroundHandler},
-		{2732, 2048, "Default-Landscape-1366@2x~ipad.png", BackgroundForegroundHandler},
+		{640, 960, "Default@2x.png", BackgroundForegroundHandler},
+		{640, 1136, "Default-568h@2x.png", BackgroundForegroundHandler},
+		{1136, 640, "Default-Landscape-568h@2x.png", BackgroundForegroundHandler},
+		{750, 1334, "Default-667h@2x.png", BackgroundForegroundHandler},
+		{1334, 750, "Default-Landscape-667h@2x.png", BackgroundForegroundHandler},
+		{1242, 2208, "Default-736h@3x.png", BackgroundForegroundHandler},
+		{2208, 1242, "Default-Landscape-736h@3x.png", BackgroundForegroundHandler},
+		{768, 1024, "Default-Portrait.png", BackgroundForegroundHandler},
+		{1024, 768, "Default-Landscape.png", BackgroundForegroundHandler},
+		{1536, 2048, "Default-Portrait@2x.png", BackgroundForegroundHandler},
+		{2048, 1536, "Default-Landscape@2x.png", BackgroundForegroundHandler},
+		{1668, 2224, "Default-Portrait-1112@2x.png", BackgroundForegroundHandler},
+		{2224, 1668, "Default-Landscape-1112@2x.png", BackgroundForegroundHandler},
+		{1125, 2436, "Default-375w-812h@3x.png", BackgroundForegroundHandler},
+		{2436, 1125, "Default-Landscape-X.png", BackgroundForegroundHandler},
+		{2048, 2732, "Default-Portrait-1366@2x.png", BackgroundForegroundHandler},
+		{2732, 2048, "Default-Landscape-1366@2x.png", BackgroundForegroundHandler},
 	}
 	appIconSpecifications = []appIconSpec{
-		{20, "Icon-Small-20.png"},
-		{29, "Icon-29.png"},
+		// Recommended if you have a Settings bundle, optional otherwise
 		{29, "Icon-Small.png"},
-		{30, "Icon-Small-30.png"},
-		{40, "Icon-40.png"},
-		{40, "Icon-Small-40.png"},
-		{40, "Icon-Small-20@2x.png"},
-		{50, "Icon-Small-50.png"},
-		{57, "Icon.png"},
-		{58, "Icon-29@2x.png"},
 		{58, "Icon-Small@2x.png"},
-		{60, "Icon-Small-30@2x.png"},
-		{72, "Icon-72.png"},
-		{76, "Icon-76.png"},
-		{80, "Icon-40@2x.png"},
+		{87, "Icon-Small@3x.png"},
+		// Spotlight
+		{40, "Icon-Small-40.png"},
 		{80, "Icon-Small-40@2x.png"},
-		{87, "Icon-29@3x.png"},
-		{100, "Icon-Small-50@2x.png"},
-		{114, "Icon@2x.png"},
-		{120, "Icon-40@3x.png"},
-		{120, "Icon-60@2x.png"},
-		{120, "Icon-120.png"},
-		{144, "Icon-72@2x.png"},
+		{120, "Icon-Samll-40@3x.png"},
+		// Home screen on iPad
+		{76, "Icon-76.png"},
 		{152, "Icon-76@2x.png"},
+		// Home screen on iPad Pro
+		{167, "Icon-83.5@2x.png"},
+		// Home screen on iPhone/iPod Touch with retina display
+		{120, "Icon-60@2x.png"},
 		{180, "Icon-60@3x.png"},
+		// App list in iTunes
 		{512, "iTunesArtwork.png"},
 		{1024, "iTunesArtwork@2x.png"},
 	}
@@ -177,9 +171,10 @@ func GenerateAppIcon(origin string) error {
 		return err
 	}
 
+	os.Mkdir("appicon", 0755)
 	for _, spec := range appIconSpecifications {
 		im := resize.Resize(uint(spec.Length), uint(spec.Length), m, resize.Bilinear)
-		if err := saveImage(&im, spec.Name, 1); err != nil {
+		if err := saveImage(&im, "appicon/"+spec.Name, 1); err != nil {
 			log.Println(spec.Name, err)
 		}
 	}

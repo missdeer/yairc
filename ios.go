@@ -2,6 +2,7 @@ package main
 
 import (
 	"image"
+	"image/color"
 	"image/draw"
 	_ "image/gif"
 	_ "image/jpeg"
@@ -31,23 +32,22 @@ type appIconSpec struct {
 
 var (
 	launchImageSpecifications = []launchImageSpec{
-		{640, 960, "Default@2x.png", BackgroundForegroundHandler},
-		{640, 1136, "Default-568h@2x.png", BackgroundForegroundHandler},
-		{1136, 640, "Default-Landscape-568h@2x.png", BackgroundForegroundHandler},
-		{750, 1334, "Default-667h@2x.png", BackgroundForegroundHandler},
-		{1334, 750, "Default-Landscape-667h@2x.png", BackgroundForegroundHandler},
-		{1242, 2208, "Default-736h@3x.png", BackgroundForegroundHandler},
-		{2208, 1242, "Default-Landscape-736h@3x.png", BackgroundForegroundHandler},
-		{768, 1024, "Default-Portrait.png", BackgroundForegroundHandler},
-		{1024, 768, "Default-Landscape.png", BackgroundForegroundHandler},
-		{1536, 2048, "Default-Portrait@2x.png", BackgroundForegroundHandler},
-		{2048, 1536, "Default-Landscape@2x.png", BackgroundForegroundHandler},
+		{640, 1136, "Default-568h@2x~iphone.png", BackgroundForegroundHandler},
+		{1136, 640, "Default-Landscape-568h@2x~iphone.png", BackgroundForegroundHandler},
+		{750, 1334, "Default-375w-667h@2x~iphone.png", BackgroundForegroundHandler},
+		{1334, 750, "Default-Landscape-375w-667h@2x~iphone.png", BackgroundForegroundHandler},
+		{1242, 2208, "Default-414w-736h@3x~iphone.png", BackgroundForegroundHandler},
+		{2208, 1242, "Default-Landscape-414w-736h@3x~iphone.png", BackgroundForegroundHandler},
+		{768, 1024, "Default-Portrait~ipad.png", BackgroundForegroundHandler},
+		{1024, 768, "Default-Landscape~ipad.png", BackgroundForegroundHandler},
+		{1536, 2048, "Default-Portrait@2x~ipad.png", BackgroundForegroundHandler},
+		{2048, 1536, "Default-Landscape@2x~ipad.png", BackgroundForegroundHandler},
 		{1668, 2224, "Default-Portrait-1112@2x.png", BackgroundForegroundHandler},
 		{2224, 1668, "Default-Landscape-1112@2x.png", BackgroundForegroundHandler},
-		{1125, 2436, "Default-375w-812h@3x.png", BackgroundForegroundHandler},
-		{2436, 1125, "Default-Landscape-X.png", BackgroundForegroundHandler},
-		{2048, 2732, "Default-Portrait-1366@2x.png", BackgroundForegroundHandler},
-		{2732, 2048, "Default-Landscape-1366@2x.png", BackgroundForegroundHandler},
+		{1125, 2436, "Default-812h@3x~iphone.png", BackgroundForegroundHandler},
+		{2436, 1125, "Default-Landscape-812h@3x~iphone.png", BackgroundForegroundHandler},
+		{2048, 2732, "Default-Portrait@2x.png", BackgroundForegroundHandler},
+		{2732, 2048, "Default-Landscape@2x.png", BackgroundForegroundHandler},
 	}
 	appIconSpecifications = []appIconSpec{
 		// Recommended if you have a Settings bundle, optional otherwise
@@ -171,9 +171,18 @@ func GenerateAppIcon(origin string) error {
 		return err
 	}
 
+	origLength := m.Bounds().Dx()
+	length := origLength * 4 / 5
+	m = resize.Resize(uint(length), uint(length), m, resize.Bilinear)
+
+	bm := image.NewRGBA(image.Rect(0, 0, origLength, origLength))
+	white := color.RGBA{255, 255, 255, 255}
+	draw.Draw(bm, bm.Bounds(), &image.Uniform{white}, image.ZP, draw.Src)
+	draw.Draw(bm, image.Rect(origLength/10, origLength/10, origLength/10+length, origLength/10+length), m, image.Point{0, 0}, draw.Over)
+
 	os.Mkdir("appicon", 0755)
 	for _, spec := range appIconSpecifications {
-		im := resize.Resize(uint(spec.Length), uint(spec.Length), m, resize.Bilinear)
+		im := resize.Resize(uint(spec.Length), uint(spec.Length), bm, resize.Bilinear)
 		if err := saveImage(&im, "appicon/"+spec.Name, 1); err != nil {
 			log.Println(spec.Name, err)
 		}

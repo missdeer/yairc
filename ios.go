@@ -44,8 +44,8 @@ var (
 		{2048, 1536, "Default-Landscape@2x~ipad.png", BackgroundForegroundHandler},
 		{1668, 2224, "Default-Portrait-1112@2x.png", BackgroundForegroundHandler},
 		{2224, 1668, "Default-Landscape-1112@2x.png", BackgroundForegroundHandler},
-		{1125, 2436, "Default-812h@3x~iphone.png", BackgroundForegroundHandler},
-		{2436, 1125, "Default-Landscape-812h@3x~iphone.png", BackgroundForegroundHandler},
+		{1125, 2436, "Default-375w-812h@3x.png", BackgroundForegroundHandler},
+		{2436, 1125, "Default-Landscape-375w-812h@3x.png", BackgroundForegroundHandler},
 		{2048, 2732, "Default-Portrait@2x.png", BackgroundForegroundHandler},
 		{2732, 2048, "Default-Landscape@2x.png", BackgroundForegroundHandler},
 	}

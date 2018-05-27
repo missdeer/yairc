@@ -160,7 +160,7 @@ var (
 		{
 			"size": "40x40",
 			"idiom": "ipad",
-			"filename": "Icon-40x40@1x.png",
+			"filename": "Icon-40x40.png",
 			"scale": "1x"
 		},
 		{

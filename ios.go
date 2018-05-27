@@ -51,25 +51,215 @@ var (
 	}
 	appIconSpecifications = []appIconSpec{
 		// Recommended if you have a Settings bundle, optional otherwise
-		{29, "Icon-Small.png"},
-		{58, "Icon-Small@2x.png"},
-		{87, "Icon-Small@3x.png"},
+		{29, "Icon-29x29.png"},
+		{58, "Icon-29x29@2x.png"},
+		{87, "Icon-29x29@3x.png"},
 		// Spotlight
-		{40, "Icon-Small-40.png"},
-		{80, "Icon-Small-40@2x.png"},
-		{120, "Icon-Samll-40@3x.png"},
+		{40, "Icon-40x40.png"},
+		{80, "Icon-40x40@2x.png"},
+		{120, "Icon-40x40@3x.png"},
 		// Home screen on iPad
-		{76, "Icon-76.png"},
-		{152, "Icon-76@2x.png"},
+		{76, "Icon-76x76.png"},
+		{152, "Icon-76x76@2x.png"},
 		// Home screen on iPad Pro
-		{167, "Icon-83.5@2x.png"},
+		{167, "Icon-83.5x83.5@2x.png"},
 		// Home screen on iPhone/iPod Touch with retina display
-		{120, "Icon-60@2x.png"},
-		{180, "Icon-60@3x.png"},
+		{20, "Icon-20x20.png"},
+		{40, "Icon-20x20@2x.png"},
+		{60, "Icon-20x20@3x.png"},
+		{120, "Icon-60x60@2x.png"},
+		{180, "Icon-60x60@3x.png"},
+		// iWatch
+		{48, "Icon-24@2x.png"},
+		{55, "Icon-27.5@2x.png"},
+		{58, "Icon-29@2x.png"},
+		{80, "Icon-40@2x.png"},
+		{87, "Icon-29@3x.png"},
+		{88, "Icon-44@2x.png"},
+		{172, "Icon-86@2x.png"},
+		{196, "Icon-98@2x.png"},
 		// App list in iTunes
-		{512, "iTunesArtwork.png"},
+		//{512, "iTunesArtwork.png"},
 		{1024, "iTunesArtwork@2x.png"},
 	}
+
+	contentsJson = `{
+	"images": [
+		{
+			"size": "20x20",
+			"idiom": "iphone",
+			"filename": "Icon-20x20@2x.png",
+			"scale": "2x"
+		},
+		{
+			"size": "20x20",
+			"idiom": "iphone",
+			"filename": "Icon-20x20@3x.png",
+			"scale": "3x"
+		},
+		{
+			"size": "29x29",
+			"idiom": "iphone",
+			"filename": "Icon-29x29@2x.png",
+			"scale": "2x"
+		},
+		{
+			"size": "29x29",
+			"idiom": "iphone",
+			"filename": "Icon-29x29@3x.png",
+			"scale": "3x"
+		},
+		{
+			"size": "40x40",
+			"idiom": "iphone",
+			"filename": "Icon-40x40@2x.png",
+			"scale": "2x"
+		},
+		{
+			"size": "40x40",
+			"idiom": "iphone",
+			"filename": "Icon-40x40@3x.png",
+			"scale": "3x"
+		},
+		{
+			"size": "60x60",
+			"idiom": "iphone",
+			"filename": "Icon-60x60@2x.png",
+			"scale": "2x"
+		},
+		{
+			"size": "60x60",
+			"idiom": "iphone",
+			"filename": "Icon-60x60@3x.png",
+			"scale": "3x"
+		},
+		{
+			"size": "20x20",
+			"idiom": "ipad",
+			"filename": "Icon-20x20.png",
+			"scale": "1x"
+		},
+		{
+			"size": "20x20",
+			"idiom": "ipad",
+			"filename": "Icon-20x20@2x.png",
+			"scale": "2x"
+		},
+		{
+			"size": "29x29",
+			"idiom": "ipad",
+			"filename": "Icon-29x29.png",
+			"scale": "1x"
+		},
+		{
+			"size": "29x29",
+			"idiom": "ipad",
+			"filename": "Icon-29x29@2x.png",
+			"scale": "2x"
+		},
+		{
+			"size": "40x40",
+			"idiom": "ipad",
+			"filename": "Icon-40x40@1x.png",
+			"scale": "1x"
+		},
+		{
+			"size": "40x40",
+			"idiom": "ipad",
+			"filename": "Icon-40x40@2x.png",
+			"scale": "2x"
+		},
+		{
+			"size": "76x76",
+			"idiom": "ipad",
+			"filename": "Icon-76x76.png",
+			"scale": "1x"
+		},
+		{
+			"size": "76x76",
+			"idiom": "ipad",
+			"filename": "Icon-76x76@2x.png",
+			"scale": "2x"
+		},
+		{
+			"size": "83.5x83.5",
+			"idiom": "ipad",
+			"filename": "Icon-83.5x83.5@2x.png",
+			"scale": "2x"
+		},
+		{
+			"size": "1024x1024",
+			"idiom": "ios-marketing",
+			"filename": "iTunesArtwork@2x.png",
+			"scale": "1x"
+		},
+		{
+			"size": "24x24",
+			"idiom": "watch",
+			"scale": "2x",
+			"filename": "Icon-24@2x.png",
+			"role": "notificationCenter",
+			"subtype": "38mm"
+		},
+		{
+			"size": "27.5x27.5",
+			"idiom": "watch",
+			"scale": "2x",
+			"filename": "Icon-27.5@2x.png",
+			"role": "notificationCenter",
+			"subtype": "42mm"
+		},
+		{
+			"size": "29x29",
+			"idiom": "watch",
+			"filename": "Icon-29@2x.png",
+			"role": "companionSettings",
+			"scale": "2x"
+		},
+		{
+			"size": "29x29",
+			"idiom": "watch",
+			"filename": "Icon-29@3x.png",
+			"role": "companionSettings",
+			"scale": "3x"
+		},
+		{
+			"size": "40x40",
+			"idiom": "watch",
+			"scale": "2x",
+			"filename": "Icon-40@2x.png",
+			"role": "appLauncher",
+			"subtype": "38mm"
+		},
+		{
+			"size": "44x44",
+			"idiom": "watch",
+			"scale": "2x",
+			"filename": "Icon-44@2x.png",
+			"role": "longLook",
+			"subtype": "42mm"
+		},
+		{
+			"size": "86x86",
+			"idiom": "watch",
+			"scale": "2x",
+			"filename": "Icon-86@2x.png",
+			"role": "quickLook",
+			"subtype": "38mm"
+		},
+		{
+			"size": "98x98",
+			"idiom": "watch",
+			"scale": "2x",
+			"filename": "Icon-98@2x.png",
+			"role": "quickLook",
+			"subtype": "42mm"
+		}
+	],
+	"properties": {
+		"pre-rendered": true
+	}
+}`
 )
 
 func BackgroundForegroundHandler(bm image.Image, fm image.Image, savePath string, spec *launchImageSpec) error {
@@ -181,12 +371,22 @@ func GenerateAppIcon(origin string) error {
 	draw.Draw(bm, image.Rect(origLength/10, origLength/10, origLength/10+length, origLength/10+length), m, image.Point{0, 0}, draw.Over)
 
 	os.Mkdir("appicon", 0755)
+	os.Mkdir("appicon/ios", 0755)
+	os.Mkdir("appicon/ios/Images.xcassets", 0755)
+	os.Mkdir("appicon/ios/Images.xcassets/AppIcon.appiconset", 0755)
 	for _, spec := range appIconSpecifications {
 		im := resize.Resize(uint(spec.Length), uint(spec.Length), bm, resize.Bilinear)
-		if err := saveImage(&im, "appicon/"+spec.Name, 1); err != nil {
+		if err := saveImage(&im, "appicon/ios/Images.xcassets/AppIcon.appiconset/"+spec.Name, 1); err != nil {
 			log.Println(spec.Name, err)
 		}
 	}
+
+	fd, err := os.OpenFile("appicon/ios/Images.xcassets/AppIcon.appiconset/Contents.json", os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	fd.WriteString(contentsJson)
+	fd.Close()
 	return nil
 }
 

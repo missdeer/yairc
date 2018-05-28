@@ -3,12 +3,14 @@ package main
 import (
 	"errors"
 	"fmt"
+	"image"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
 
+	"github.com/JackMordaunt/icns"
 	"github.com/fsnotify/fsnotify"
 	flag "github.com/ogier/pflag"
 )
@@ -32,6 +34,7 @@ var (
 	imagedirectory       string
 	backgroundImagePath  string
 	foregroundImagePath  string
+	inputImagePath       string
 )
 
 func main() {
@@ -46,6 +49,7 @@ func main() {
 	flag.BoolVarP(&watch, "watch", "w", false, "watch directories change")
 	flag.StringVarP(&backgroundImagePath, "background", "b", "", "path of background image for launch image")
 	flag.StringVarP(&foregroundImagePath, "foreground", "f", "", "path of foreground image for launch image")
+	flag.StringVarP(&inputImagePath, "icns", "", "", "convert input image file to .icns file")
 	flag.Parse()
 	if len(os.Args) < 2 {
 		log.Fatal("Incorrect arguments! Use --help to get the usage.")
@@ -74,6 +78,30 @@ func main() {
 	// ios launch image mode
 	if iosLaunchImage == true {
 		GenerateLaunchImage()
+		return
+	}
+
+	// convert to .icns file
+	if inputImagePath != "" {
+		pngf, err := os.Open(inputImagePath)
+		if err != nil {
+			log.Fatalf("opening source image: %v", err)
+		}
+		defer pngf.Close()
+		srcImg, _, err := image.Decode(pngf)
+		if err != nil {
+			log.Fatalf("decoding source image: %v", err)
+		}
+		ext := filepath.Ext(inputImagePath)
+		outfile := inputImagePath[0:len(inputImagePath)-len(ext)] + ".icns"
+		dest, err := os.Create(outfile)
+		if err != nil {
+			log.Fatalf("opening destination file: %v", err)
+		}
+		defer dest.Close()
+		if err := icns.Encode(dest, srcImg); err != nil {
+			log.Fatalf("encoding icns: %v", err)
+		}
 		return
 	}
 

@@ -338,9 +338,10 @@ func GenerateLaunchImage() error {
 		return err
 	}
 
-	os.Mkdir("LaunchImage", 0755)
+	os.Mkdir("launchimage", 0755)
+	os.Mkdir("launchimage/ios", 0755)
 	for _, spec := range launchImageSpecifications {
-		savePath := "LaunchImage/" + spec.Postfix
+		savePath := "launchimage/ios/" + spec.Postfix
 
 		log.Println("generating ", savePath)
 		spec.Handler(bm, fm, savePath, &spec)

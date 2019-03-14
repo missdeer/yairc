@@ -36,12 +36,12 @@ func (c *Circle) At(x, y int) color.Color {
 //draw.DrawMask(dst, dst.Bounds(), src, image.ZP, &Circle{p, r}, image.ZP, draw.Over)
 
 func isDir(path string) (bool, error) {
-	var file *os.File
-	if f, err := os.OpenFile(path, os.O_RDONLY, 0644); err != nil {
+	f, err := os.OpenFile(path, os.O_RDONLY, 0644)
+	if err != nil {
 		log.Println(err)
 		return false, err
 	}
-	file = f
+	file := f
 
 	defer file.Close()
 	fi, err := file.Stat()

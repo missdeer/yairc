@@ -408,13 +408,13 @@ func iOSScale(origin string, templateSize string) error {
 			return err
 		}
 
-		name := filepath.Dir(origin) + string(filepath.Separator) + filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))] + "@2x" + filepath.Ext(origin)
+		name := filepath.Join(filepath.Dir(origin), string(filepath.Separator), filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))]+"@2x"+filepath.Ext(origin))
 		im := resize.Resize(uint(m.Bounds().Size().X*2), uint(m.Bounds().Size().Y*2), m, resize.Bilinear)
 		if err := saveImage(&im, name, 1); err != nil {
 			log.Println(name, err)
 		}
 
-		name = filepath.Dir(origin) + string(filepath.Separator) + filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))] + "@3x" + filepath.Ext(origin)
+		name = filepath.Join(filepath.Dir(origin), filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))]+"@3x"+filepath.Ext(origin))
 		im = resize.Resize(uint(m.Bounds().Size().X*3), uint(m.Bounds().Size().Y*3), m, resize.Bilinear)
 		if err := saveImage(&im, name, 1); err != nil {
 			log.Println(name, err)
@@ -423,13 +423,13 @@ func iOSScale(origin string, templateSize string) error {
 		var one, two, three string
 		if !strings.HasSuffix(filepath.Base(origin), "@2x") {
 			one = origin
-			two = filepath.Dir(origin) + string(filepath.Separator) + filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))] + "@2x" + filepath.Ext(origin)
-			three = filepath.Dir(origin) + string(filepath.Separator) + filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))] + "@3x" + filepath.Ext(origin)
+			two = filepath.Join(filepath.Dir(origin), filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))]+"@2x"+filepath.Ext(origin))
+			three = filepath.Join(filepath.Dir(origin), filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))]+"@3x"+filepath.Ext(origin))
 			os.Rename(origin, two)
 		} else {
-			one = filepath.Dir(origin) + string(filepath.Separator) + filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))-3] + filepath.Ext(origin)
+			one = filepath.Join(filepath.Dir(origin), filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))-3]+filepath.Ext(origin))
 			two = origin
-			three = filepath.Dir(origin) + string(filepath.Separator) + filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))-3] + "@3x" + filepath.Ext(origin)
+			three = filepath.Join(filepath.Dir(origin), filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))-3]+"@3x"+filepath.Ext(origin))
 		}
 
 		reader, err := os.Open(two)
@@ -457,12 +457,12 @@ func iOSScale(origin string, templateSize string) error {
 		var one, two, three string
 		if !strings.HasSuffix(filepath.Base(origin), "@3x") {
 			one = origin
-			two = filepath.Dir(origin) + string(filepath.Separator) + filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))] + "@2x" + filepath.Ext(origin)
-			three = filepath.Dir(origin) + string(filepath.Separator) + filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))] + "@3x" + filepath.Ext(origin)
+			two = filepath.Join(filepath.Dir(origin), filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))]+"@2x"+filepath.Ext(origin))
+			three = filepath.Join(filepath.Dir(origin), filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))]+"@3x"+filepath.Ext(origin))
 			os.Rename(origin, three)
 		} else {
-			one = filepath.Dir(origin) + string(filepath.Separator) + filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))-3] + filepath.Ext(origin)
-			two = filepath.Dir(origin) + string(filepath.Separator) + filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))-3] + "@2x" + filepath.Ext(origin)
+			one = filepath.Join(filepath.Dir(origin), filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))-3]+filepath.Ext(origin))
+			two = filepath.Join(filepath.Dir(origin), filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))-3]+"@2x"+filepath.Ext(origin))
 			three = origin
 		}
 

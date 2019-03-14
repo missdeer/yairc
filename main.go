@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/JackMordaunt/icns"
 	"github.com/fsnotify/fsnotify"
+	"github.com/jackmordaunt/icns"
 	flag "github.com/ogier/pflag"
 )
 
@@ -24,6 +24,7 @@ var (
 	watcher              *fsnotify.Watcher
 	cut                  bool
 	scale                bool
+	iconScaleMode        bool
 	iosScale             bool
 	iosScaleTemplateSize string
 	iosAppIcon           bool
@@ -31,31 +32,43 @@ var (
 	androidLauncherIcon  bool
 	androidSplash        bool
 	watch                bool
+	icnsMode             bool
 	imagedirectory       string
 	backgroundImagePath  string
 	foregroundImagePath  string
 	inputImagePath       string
+	outputDirectoryPath  string
 )
 
 func main() {
 	flag.BoolVarP(&cut, "cut", "c", true, "cut mode")
 	flag.BoolVarP(&scale, "scale", "s", false, "scale mode")
-	flag.BoolVarP(&iosScale, "iosscale", "i", false, "generate @1x/@2x/@3x images for iOS")
+	flag.BoolVarP(&iconScaleMode, "iconScale", "", false, "generate _/@2x/@3x/@4x & _/x18/x36/x48 icons")
+	flag.BoolVarP(&iosScale, "iOSScale", "", false, "generate @1x/@2x/@3x images for iOS")
 	flag.StringVarP(&iosScaleTemplateSize, "as", "", "1x", "iOS scale mode template size, can be 1x/2x/3x")
-	flag.BoolVarP(&iosAppIcon, "appicon", "a", false, "generate ios app icons")
-	flag.BoolVarP(&iosLaunchImage, "launchimage", "l", false, "generate ios launch images")
-	flag.BoolVarP(&androidLauncherIcon, "launchericon", "u", false, "generate android launcher icons")
-	flag.BoolVarP(&androidSplash, "splashscreen", "r", false, "generate android splash screen images")
+	flag.BoolVarP(&iosAppIcon, "appIcon", "a", false, "generate ios app icons")
+	flag.BoolVarP(&iosLaunchImage, "launchImage", "l", false, "generate ios launch images")
+	flag.BoolVarP(&androidLauncherIcon, "launcherIcon", "u", false, "generate android launcher icons")
+	flag.BoolVarP(&androidSplash, "splashScreen", "r", false, "generate android splash screen images")
 	flag.BoolVarP(&watch, "watch", "w", false, "watch directories change")
 	flag.StringVarP(&backgroundImagePath, "background", "b", "", "path of background image for launch image")
 	flag.StringVarP(&foregroundImagePath, "foreground", "f", "", "path of foreground image for launch image")
-	flag.StringVarP(&inputImagePath, "icns", "", "", "convert input image file to .icns file")
+	flag.StringVarP(&inputImagePath, "input", "i", "", "input image path")
+	flag.StringVarP(&outputDirectoryPath, "output", "o", "", "output directory path")
+	flag.BoolVarP(&icnsMode, "icns", "", false, "convert input image file to .icns file")
 	flag.Parse()
 	if len(os.Args) < 2 {
 		log.Fatal("Incorrect arguments! Use --help to get the usage.")
 	}
 	cut = !scale
 	args := flag.Args()
+
+	// icon scale mode
+	if iconScaleMode == true && inputImagePath != "" && outputDirectoryPath != "" {
+		fmt.Println("generate /@2x/@3x/@4x & /x18/x36/x48 icons")
+		iconScale(inputImagePath, outputDirectoryPath)
+		return
+	}
 
 	// ios scale Mode
 	if iosScale == true {
@@ -82,7 +95,7 @@ func main() {
 	}
 
 	// convert to .icns file
-	if inputImagePath != "" {
+	if icnsMode && inputImagePath != "" {
 		pngf, err := os.Open(inputImagePath)
 		if err != nil {
 			log.Fatalf("opening source image: %v", err)

@@ -9,9 +9,11 @@ import (
 	_ "image/png"
 	"log"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 
+	"github.com/dfordsoft/golib/fsutil"
 	"github.com/nfnt/resize"
 	"github.com/oliamb/cutter"
 )
@@ -393,6 +395,60 @@ func GenerateAppIcon(origin string) error {
 	return nil
 }
 
+func iconScale(inputFile string, outputDir string) error {
+	if b, e := fsutil.FileExists(outputDir); e != nil || !b {
+		os.MkdirAll(outputDir, 0644)
+	}
+	if b, e := fsutil.FileExists(path.Join(outputDir, "x18")); e != nil || !b {
+		os.MkdirAll(path.Join(outputDir, "x18"), 0644)
+	}
+	if b, e := fsutil.FileExists(path.Join(outputDir, "x36")); e != nil || !b {
+		os.MkdirAll(path.Join(outputDir, "x36"), 0644)
+	}
+	if b, e := fsutil.FileExists(path.Join(outputDir, "x48")); e != nil || !b {
+		os.MkdirAll(path.Join(outputDir, "x48"), 0644)
+	}
+	reader, err := os.Open(inputFile)
+	if err != nil {
+		log.Println(inputFile, err)
+		return err
+	}
+	defer reader.Close()
+	m, _, err := image.Decode(reader)
+	if err != nil {
+		log.Println(inputFile, err)
+		return err
+	}
+	infos := []struct {
+		length       uint
+		relativePath string
+	}{
+		{24, filepath.Join(outputDir, filepath.Base(inputFile))},
+		{48, filepath.Join(outputDir, filepath.Base(inputFile)[:len(filepath.Base(inputFile))-len(filepath.Ext(inputFile))]+"@2x"+filepath.Ext(inputFile))},
+		{72, filepath.Join(outputDir, filepath.Base(inputFile)[:len(filepath.Base(inputFile))-len(filepath.Ext(inputFile))]+"@3x"+filepath.Ext(inputFile))},
+		{96, filepath.Join(outputDir, filepath.Base(inputFile)[:len(filepath.Base(inputFile))-len(filepath.Ext(inputFile))]+"@4x"+filepath.Ext(inputFile))},
+		{18, filepath.Join(outputDir, "x18", filepath.Base(inputFile))},
+		{36, filepath.Join(outputDir, "x18", filepath.Base(inputFile)[:len(filepath.Base(inputFile))-len(filepath.Ext(inputFile))]+"@2x"+filepath.Ext(inputFile))},
+		{54, filepath.Join(outputDir, "x18", filepath.Base(inputFile)[:len(filepath.Base(inputFile))-len(filepath.Ext(inputFile))]+"@3x"+filepath.Ext(inputFile))},
+		{72, filepath.Join(outputDir, "x18", filepath.Base(inputFile)[:len(filepath.Base(inputFile))-len(filepath.Ext(inputFile))]+"@4x"+filepath.Ext(inputFile))},
+		{36, filepath.Join(outputDir, "x36", filepath.Base(inputFile))},
+		{72, filepath.Join(outputDir, "x36", filepath.Base(inputFile)[:len(filepath.Base(inputFile))-len(filepath.Ext(inputFile))]+"@2x"+filepath.Ext(inputFile))},
+		{108, filepath.Join(outputDir, "x36", filepath.Base(inputFile)[:len(filepath.Base(inputFile))-len(filepath.Ext(inputFile))]+"@3x"+filepath.Ext(inputFile))},
+		{144, filepath.Join(outputDir, "x36", filepath.Base(inputFile)[:len(filepath.Base(inputFile))-len(filepath.Ext(inputFile))]+"@4x"+filepath.Ext(inputFile))},
+		{48, filepath.Join(outputDir, "x48", filepath.Base(inputFile))},
+		{96, filepath.Join(outputDir, "x48", filepath.Base(inputFile)[:len(filepath.Base(inputFile))-len(filepath.Ext(inputFile))]+"@2x"+filepath.Ext(inputFile))},
+		{144, filepath.Join(outputDir, "x48", filepath.Base(inputFile)[:len(filepath.Base(inputFile))-len(filepath.Ext(inputFile))]+"@3x"+filepath.Ext(inputFile))},
+		{192, filepath.Join(outputDir, "x48", filepath.Base(inputFile)[:len(filepath.Base(inputFile))-len(filepath.Ext(inputFile))]+"@4x"+filepath.Ext(inputFile))},
+	}
+	for _, info := range infos {
+		im := resize.Resize(info.length, info.length, m, resize.Bilinear)
+		if err := saveImage(&im, info.relativePath, 1); err != nil {
+			log.Println(info.relativePath, err)
+		}
+	}
+	return nil
+}
+
 func iOSScale(origin string, templateSize string) error {
 	switch templateSize {
 	case "1x":
@@ -408,7 +464,7 @@ func iOSScale(origin string, templateSize string) error {
 			return err
 		}
 
-		name := filepath.Join(filepath.Dir(origin), string(filepath.Separator), filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))]+"@2x"+filepath.Ext(origin))
+		name := filepath.Join(filepath.Dir(origin), filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))]+"@2x"+filepath.Ext(origin))
 		im := resize.Resize(uint(m.Bounds().Size().X*2), uint(m.Bounds().Size().Y*2), m, resize.Bilinear)
 		if err := saveImage(&im, name, 1); err != nil {
 			log.Println(name, err)

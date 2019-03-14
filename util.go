@@ -40,9 +40,9 @@ func isDir(path string) (bool, error) {
 	if f, err := os.OpenFile(path, os.O_RDONLY, 0644); err != nil {
 		log.Println(err)
 		return false, err
-	} else {
-		file = f
 	}
+	file = f
+
 	defer file.Close()
 	fi, err := file.Stat()
 	if err != nil {
@@ -65,7 +65,7 @@ func saveRGBA(rgba *image.RGBA, savePath string, imagetype int) (err error) {
 	case 1:
 		err = png.Encode(file, rgba)
 	default:
-		err = jpeg.Encode(file, rgba, &jpeg.Options{100})
+		err = jpeg.Encode(file, rgba, &jpeg.Options{Quality: 100})
 	}
 
 	if err != nil {
@@ -88,7 +88,7 @@ func saveImage(img *image.Image, savePath string, imagetype int) (err error) {
 	case 1:
 		err = png.Encode(file, *img)
 	default:
-		err = jpeg.Encode(file, *img, &jpeg.Options{100})
+		err = jpeg.Encode(file, *img, &jpeg.Options{Quality: 100})
 	}
 
 	if err != nil {

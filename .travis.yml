@@ -1,12 +1,11 @@
 language: go
 go:
-- tip
+- 1.12
 env:
   global:
   - GITHUB_REPO: dfordsoft/yairc
   - GIT_NAME: missdeer
   - GIT_EMAIL: missdeer@dfordsoft.com
-  - secure: Putn2dfCb7wEXFZ5yF/TFo8HHiyIGf7b80C5lJHB4YTKxKBic8xOd3v6IhVfXNZgHSvuA+TVDI9VQJ9eRviJalCVN1qP88oLlrj4/q1WeF9DDUxpTPHV1uP/z6F8s0nmyICRFPs7Gq0fUyfZae+DgF0uaZT+6VxDksjg25eYFFQ=
 deploy:
   provider: releases
   api_key:
@@ -18,15 +17,6 @@ deploy:
     - yairc-freebsd-arm.tar.gz
     - yairc-freebsd-x86.tar.gz
     - yairc-linux-amd64.tar.gz
-    - yairc-linux-arm64.tar.gz
-    - yairc-linux-armv6.tar.gz
-    - yairc-linux-armv7.tar.gz
-    - yairc-linux-mips64.tar.gz
-    - yairc-linux-mips64le.tar.gz
-    - yairc-linux-mips.tar.gz
-    - yairc-linux-mipsle.tar.gz
-    - yairc-linux-ppc64.tar.gz
-    - yairc-linux-ppc64le.tar.gz
     - yairc-linux-x86.tar.gz
     - yairc-netbsd-amd64.tar.gz
     - yairc-netbsd-arm.tar.gz
@@ -42,7 +32,6 @@ deploy:
   skip_cleanup: true
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install -qq wine
   - sudo apt-get install -qq g++-mingw-w64-i686
   - sudo apt-get install -qq g++-mingw-w64-x86-64
 install:
@@ -51,16 +40,6 @@ script:
   - pwd && ls -l
   - env CGO_ENABLED=1 GOARCH=amd64 GOOS=linux go build -ldflags="-s -w"  && tar czvf yairc-linux-amd64.tar.gz yairc
   - env CGO_ENABLED=1 GOARCH=386 GOOS=linux go build -ldflags="-s -w"  && tar czvf yairc-linux-x86.tar.gz yairc
-  - env CGO_ENABLED=1 GOARCH=arm GOARM=5 GOOS=linux go build -ldflags="-s -w"  && tar czvf yairc-linux-armv5.tar.gz yairc
-  - env CGO_ENABLED=1 GOARCH=arm GOARM=6 GOOS=linux go build -ldflags="-s -w"  && tar czvf yairc-linux-armv6.tar.gz yairc
-  - env CGO_ENABLED=1 GOARCH=arm GOARM=7 GOOS=linux go build -ldflags="-s -w"  && tar czvf yairc-linux-armv7.tar.gz yairc
-  - env CGO_ENABLED=1 GOARCH=arm64 GOOS=linux go build -ldflags="-s -w"  && tar czvf yairc-linux-arm64.tar.gz yairc
-  - env CGO_ENABLED=1 GOARCH=ppc64 GOOS=linux go build -ldflags="-s -w"  && tar czvf yairc-linux-ppc64.tar.gz yairc
-  - env CGO_ENABLED=1 GOARCH=ppc64le GOOS=linux go build -ldflags="-s -w"  && tar czvf yairc-linux-ppc64le.tar.gz yairc
-  - env CGO_ENABLED=1 GOARCH=mips64 GOOS=linux go build -ldflags="-s -w"  && tar czvf yairc-linux-mips64.tar.gz yairc
-  - env CGO_ENABLED=1 GOARCH=mips64le GOOS=linux go build -ldflags="-s -w"  && tar czvf yairc-linux-mips64le.tar.gz yairc
-  - env CGO_ENABLED=1 GOARCH=mips GOOS=linux go build -ldflags="-s -w"  && tar czvf yairc-linux-mips.tar.gz yairc
-  - env CGO_ENABLED=1 GOARCH=mipsle GOOS=linux go build -ldflags="-s -w"  && tar czvf yairc-linux-mipsle.tar.gz yairc
   - env CGO_ENABLED=1 GOARCH=amd64 GOOS=darwin go build  && tar czvf yairc-darwin-amd64.tar.gz yairc
   - env CGO_ENABLED=1 CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ LD=x86_64-w64-mingw32-ld GOARCH=amd64 GOOS=windows go build  && tar czvf yairc-windows-amd64.tar.gz yairc.exe
   - env CGO_ENABLED=1 CC=i686-w64-mingw32-gcc CXX=i686-w64-mingw32-g++ LD=i686-w64-mingw32-ld GOARCH=386 GOOS=windows go build  && tar czvf yairc-windows-x86.tar.gz yairc.exe

@@ -33,6 +33,7 @@ var (
 	androidSplash        bool
 	watch                bool
 	icnsMode             bool
+	compress             bool
 	imagedirectory       string
 	backgroundImagePath  string
 	foregroundImagePath  string
@@ -43,6 +44,7 @@ var (
 func main() {
 	flag.BoolVarP(&cut, "cut", "c", true, "cut mode")
 	flag.BoolVarP(&scale, "scale", "s", false, "scale mode")
+	flag.BoolVarP(&compress, "compress", "", true, "compress output PNG files")
 	flag.BoolVarP(&iconScaleMode, "iconScale", "", false, "generate _/@2x/@3x/@4x & _/x18/x36/x48 icons")
 	flag.BoolVarP(&iosScale, "iOSScale", "", false, "generate @1x/@2x/@3x images for iOS")
 	flag.StringVarP(&iosScaleTemplateSize, "as", "", "1x", "iOS scale mode template size, can be 1x/2x/3x")

@@ -7,6 +7,9 @@ YAIRC - Yet Another Image Resizer & Cutter, formerly known as TaobaoMobileImageR
 
 编译
 ----
+
+需要支持CGO，将编译器路径添加到`PATH`或`CC`、`CXX`路径中。
+
 `go get github.com/dfordsoft/yairc`
 
 功能

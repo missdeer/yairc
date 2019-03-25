@@ -64,6 +64,9 @@ func saveRGBA(rgba *image.RGBA, savePath string, imagetype int) (err error) {
 	switch imagetype {
 	case 1:
 		err = png.Encode(file, rgba)
+		if err == nil && compress == true {
+			err = crush(savePath)
+		}
 	default:
 		err = jpeg.Encode(file, rgba, &jpeg.Options{Quality: 100})
 	}
@@ -87,6 +90,9 @@ func saveImage(img *image.Image, savePath string, imagetype int) (err error) {
 	switch imagetype {
 	case 1:
 		err = png.Encode(file, *img)
+		if err == nil && compress == true {
+			err = crush(savePath)
+		}
 	default:
 		err = jpeg.Encode(file, *img, &jpeg.Options{Quality: 100})
 	}

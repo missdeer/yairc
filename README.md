@@ -21,6 +21,30 @@ YAIRC - Yet Another Image Resizer & Cutter, formerly known as TaobaoMobileImageR
 ----
 目前只提供命令行使用方法。
 
+####生成iOS launch images：准备一个足够大小的背景图片模板background.png，因为最大的iOS设备是iPad Pro 12"，将使用2048 * 2732大小的launch image，再准备一个足够大的前景图片模板foreground.png，建议至少512 * 512。程序会自动按比例缩放和剪裁图片。
+
+```bash
+./yairc -b background.png -f foreground --launchImage
+```
+
+####生成iOS app icons：准备一个1024*1024大小的图片模板template.png
+
+```bash
+./yairc --appIcon template.png
+```
+
+#### 生成iOS app所需要的3倍图片文件：准备好图片文件template.png
+
+```bash
+./yairc --iOSScale --as=2x template.png
+```
+
+#### 生成HiDPI设备多分辨率图片文件：准备好图片文件template.png
+
+```bash
+./yairc --iconScale -i template.png -o destine/path
+```
+
 ####生成淘宝移动版适配图片常规用法：命令行后加入文件名或目录名，程序将所有文件，目录及子目录中的文件都生成对应的小于620*960分辨率的图片。
 
 ```bash
@@ -39,24 +63,6 @@ YAIRC - Yet Another Image Resizer & Cutter, formerly known as TaobaoMobileImageR
 ```bash
 ./yairc -c filename1 [filename2 filename3 ...]
 ./yairc -c directory1 [directory2 directory3 ...]
-```
-
-####生成iOS launch images：准备一个足够大小的背景图片模板background.png，因为最大的iOS设备是iPad Pro 12"，将使用2048 * 2732大小的launch image，再准备一个足够大的前景图片模板foreground.png，建议至少512 * 512。程序会自动按比例缩放和剪裁图片。
-
-```bash
-./yairc -b background.png -f foreground -l
-```
-
-####生成iOS app icons：准备一个1024*1024大小的图片模板template.png
-
-```bash
-./yairc -a template.png
-```
-
-#### 生成iOS app所需要的3倍图片文件：准备好图片文件template.png
-
-```bash
-./yairc -i --as=2x template.png
 ```
 
 TODO

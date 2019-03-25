@@ -11,19 +11,7 @@ deploy:
   api_key:
     secure: KsjKdjAjQef5QAVCmcxGcxYxtdXTHtCFxP9zzMLcU+rLQDiQxbFvzoOw6L+b+CCj4fvVuHvC1Ib+a08ct8ZEsKwE/e0UWBIlx8+Gym2EJAbFHD1GXvKpL5Cn3UqO7KdEx0dXk8WORQLpsPxuWTlGycRBVmT0EdYhPnLBRPbghDQ=
   file:
-    - yairc-darwin-amd64.tar.gz
-    - yairc-dragonflybsd-amd64.tar.gz
-    - yairc-freebsd-amd64.tar.gz
-    - yairc-freebsd-arm.tar.gz
-    - yairc-freebsd-x86.tar.gz
     - yairc-linux-amd64.tar.gz
-    - yairc-linux-x86.tar.gz
-    - yairc-netbsd-amd64.tar.gz
-    - yairc-netbsd-arm.tar.gz
-    - yairc-netbsd-x86.tar.gz
-    - yairc-openbsd-amd64.tar.gz
-    - yairc-openbsd-x86.tar.gz
-    - yairc-solaris-amd64.tar.gz
     - yairc-windows-amd64.tar.gz
     - yairc-windows-x86.tar.gz
   on:
@@ -39,18 +27,6 @@ install:
 script:
   - pwd && ls -l
   - env CGO_ENABLED=1 GOARCH=amd64 GOOS=linux go build -ldflags="-s -w"  && tar czvf yairc-linux-amd64.tar.gz yairc
-  - env CGO_ENABLED=1 GOARCH=386 GOOS=linux go build -ldflags="-s -w"  && tar czvf yairc-linux-x86.tar.gz yairc
-  - env CGO_ENABLED=1 GOARCH=amd64 GOOS=darwin go build  && tar czvf yairc-darwin-amd64.tar.gz yairc
   - env CGO_ENABLED=1 CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ LD=x86_64-w64-mingw32-ld GOARCH=amd64 GOOS=windows go build  && tar czvf yairc-windows-amd64.tar.gz yairc.exe
   - env CGO_ENABLED=1 CC=i686-w64-mingw32-gcc CXX=i686-w64-mingw32-g++ LD=i686-w64-mingw32-ld GOARCH=386 GOOS=windows go build  && tar czvf yairc-windows-x86.tar.gz yairc.exe
-  - env CGO_ENABLED=1 GOARCH=amd64 GOOS=freebsd go build  && tar czvf yairc-freebsd-amd64.tar.gz yairc
-  - env CGO_ENABLED=1 GOARCH=386 GOOS=freebsd go build  && tar czvf yairc-freebsd-x86.tar.gz yairc
-  - env CGO_ENABLED=1 GOARCH=arm GOOS=freebsd go build  && tar czvf yairc-freebsd-arm.tar.gz yairc
-  - env CGO_ENABLED=1 GOARCH=amd64 GOOS=openbsd go build  && tar czvf yairc-openbsd-amd64.tar.gz yairc
-  - env CGO_ENABLED=1 GOARCH=386 GOOS=openbsd go build  && tar czvf yairc-openbsd-x86.tar.gz yairc
-  - env CGO_ENABLED=1 GOARCH=amd64 GOOS=netbsd go build  && tar czvf yairc-netbsd-amd64.tar.gz yairc
-  - env CGO_ENABLED=1 GOARCH=386 GOOS=netbsd go build  && tar czvf yairc-netbsd-x86.tar.gz yairc
-  - env CGO_ENABLED=1 GOARCH=arm GOOS=netbsd go build  && tar czvf yairc-netbsd-arm.tar.gz yairc
-  - env CGO_ENABLED=1 GOARCH=amd64 GOOS=dragonfly go build  && tar czvf yairc-dragonflybsd-amd64.tar.gz yairc
-  - env CGO_ENABLED=1 GOARCH=amd64 GOOS=solaris go build  && tar czvf yairc-solaris-amd64.tar.gz yairc
   - ls -l

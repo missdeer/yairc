@@ -55,33 +55,42 @@ var (
 	}
 	appIconSpecifications = []appIconSpec{
 		// Recommended if you have a Settings bundle, optional otherwise
-		{29, "Icon-29x29.png"},
-		{58, "Icon-29x29@2x.png"},
-		{87, "Icon-29x29@3x.png"},
+		{29, "AppIcon29x29.png"},
+		{29, "AppIcon29x29.png"},
+		{58, "AppIcon29x29@2x.png"},
+		{58, "AppIcon29x29@2x.png"},
+		{87, "AppIcon29x29@3x.png"},
+		{57, "AppIcon57x57.png"},
+		{114, "AppIcon57x57@2x.png"},
+		{144, "AppIcon72x72@2x.png"},
+		{72, "AppIcon72x72.png"},
 		// Spotlight
-		{40, "Icon-40x40.png"},
-		{80, "Icon-40x40@2x.png"},
-		{120, "Icon-40x40@3x.png"},
+		{40, "AppIcon40x40.png"},
+		{80, "AppIcon40x40@2x.png"},
+		{80, "AppIcon40x40@2x.png"},
+		{50, "AppIcon50x50.png"},
+		{100, "AppIcon50x50@2x.png"},
+		{120, "AppIcon40x40@3x.png"},
 		// Home screen on iPad
-		{76, "Icon-76x76.png"},
-		{152, "Icon-76x76@2x.png"},
+		{76, "AppIcon76x76.png"},
+		{152, "AppIcon76x76@2x.png"},
 		// Home screen on iPad Pro
-		{167, "Icon-83.5x83.5@2x.png"},
+		{167, "AppIcon83.5x83.5@2x.png"},
 		// Home screen on iPhone/iPod Touch with retina display
-		{20, "Icon-20x20.png"},
-		{40, "Icon-20x20@2x.png"},
-		{60, "Icon-20x20@3x.png"},
-		{120, "Icon-60x60@2x.png"},
-		{180, "Icon-60x60@3x.png"},
+		{20, "AppIcon20x20.png"},
+		{40, "AppIcon20x20@2x.png"},
+		{60, "AppIcon20x20@3x.png"},
+		{120, "AppIcon60x60@2x.png"},
+		{180, "AppIcon60x60@3x.png"},
 		// iWatch
-		{48, "Icon-24@2x.png"},
-		{55, "Icon-27.5@2x.png"},
-		{58, "Icon-29@2x.png"},
-		{80, "Icon-40@2x.png"},
-		{87, "Icon-29@3x.png"},
-		{88, "Icon-44@2x.png"},
-		{172, "Icon-86@2x.png"},
-		{196, "Icon-98@2x.png"},
+		{48, "AppIcon24@2x.png"},
+		{55, "AppIcon27.5@2x.png"},
+		{58, "AppIcon29@2x.png"},
+		{80, "AppIcon40@2x.png"},
+		{87, "AppIcon29@3x.png"},
+		{88, "AppIcon44@2x.png"},
+		{172, "AppIcon86@2x.png"},
+		{196, "AppIcon98@2x.png"},
 		// App list in iTunes
 		//{512, "iTunesArtwork.png"},
 		{1024, "iTunesArtwork@2x.png"},
@@ -92,103 +101,103 @@ var (
 		{
 			"size": "20x20",
 			"idiom": "iphone",
-			"filename": "Icon-20x20@2x.png",
+			"filename": "AppIcon20x20@2x.png",
 			"scale": "2x"
 		},
 		{
 			"size": "20x20",
 			"idiom": "iphone",
-			"filename": "Icon-20x20@3x.png",
+			"filename": "AppIcon20x20@3x.png",
 			"scale": "3x"
 		},
 		{
 			"size": "29x29",
 			"idiom": "iphone",
-			"filename": "Icon-29x29@2x.png",
+			"filename": "AppIcon29x29@2x.png",
 			"scale": "2x"
 		},
 		{
 			"size": "29x29",
 			"idiom": "iphone",
-			"filename": "Icon-29x29@3x.png",
+			"filename": "AppIcon29x29@3x.png",
 			"scale": "3x"
 		},
 		{
 			"size": "40x40",
 			"idiom": "iphone",
-			"filename": "Icon-40x40@2x.png",
+			"filename": "AppIcon40x40@2x.png",
 			"scale": "2x"
 		},
 		{
 			"size": "40x40",
 			"idiom": "iphone",
-			"filename": "Icon-40x40@3x.png",
+			"filename": "AppIcon40x40@3x.png",
 			"scale": "3x"
 		},
 		{
 			"size": "60x60",
 			"idiom": "iphone",
-			"filename": "Icon-60x60@2x.png",
+			"filename": "AppIcon60x60@2x.png",
 			"scale": "2x"
 		},
 		{
 			"size": "60x60",
 			"idiom": "iphone",
-			"filename": "Icon-60x60@3x.png",
+			"filename": "AppIcon60x60@3x.png",
 			"scale": "3x"
 		},
 		{
 			"size": "20x20",
 			"idiom": "ipad",
-			"filename": "Icon-20x20.png",
+			"filename": "AppIcon20x20.png",
 			"scale": "1x"
 		},
 		{
 			"size": "20x20",
 			"idiom": "ipad",
-			"filename": "Icon-20x20@2x.png",
+			"filename": "AppIcon20x20@2x.png",
 			"scale": "2x"
 		},
 		{
 			"size": "29x29",
 			"idiom": "ipad",
-			"filename": "Icon-29x29.png",
+			"filename": "AppIcon29x29.png",
 			"scale": "1x"
 		},
 		{
 			"size": "29x29",
 			"idiom": "ipad",
-			"filename": "Icon-29x29@2x.png",
+			"filename": "AppIcon29x29@2x.png",
 			"scale": "2x"
 		},
 		{
 			"size": "40x40",
 			"idiom": "ipad",
-			"filename": "Icon-40x40.png",
+			"filename": "AppIcon40x40.png",
 			"scale": "1x"
 		},
 		{
 			"size": "40x40",
 			"idiom": "ipad",
-			"filename": "Icon-40x40@2x.png",
+			"filename": "AppIcon40x40@2x.png",
 			"scale": "2x"
 		},
 		{
 			"size": "76x76",
 			"idiom": "ipad",
-			"filename": "Icon-76x76.png",
+			"filename": "AppIcon76x76.png",
 			"scale": "1x"
 		},
 		{
 			"size": "76x76",
 			"idiom": "ipad",
-			"filename": "Icon-76x76@2x.png",
+			"filename": "AppIcon76x76@2x.png",
 			"scale": "2x"
 		},
 		{
 			"size": "83.5x83.5",
 			"idiom": "ipad",
-			"filename": "Icon-83.5x83.5@2x.png",
+			"filename": "AppIcon83.5x83.5@2x.png",
 			"scale": "2x"
 		},
 		{
@@ -201,7 +210,7 @@ var (
 			"size": "24x24",
 			"idiom": "watch",
 			"scale": "2x",
-			"filename": "Icon-24@2x.png",
+			"filename": "AppIcon24@2x.png",
 			"role": "notificationCenter",
 			"subtype": "38mm"
 		},
@@ -209,21 +218,21 @@ var (
 			"size": "27.5x27.5",
 			"idiom": "watch",
 			"scale": "2x",
-			"filename": "Icon-27.5@2x.png",
+			"filename": "AppIcon27.5@2x.png",
 			"role": "notificationCenter",
 			"subtype": "42mm"
 		},
 		{
 			"size": "29x29",
 			"idiom": "watch",
-			"filename": "Icon-29@2x.png",
+			"filename": "AppIcon29@2x.png",
 			"role": "companionSettings",
 			"scale": "2x"
 		},
 		{
 			"size": "29x29",
 			"idiom": "watch",
-			"filename": "Icon-29@3x.png",
+			"filename": "AppIcon29@3x.png",
 			"role": "companionSettings",
 			"scale": "3x"
 		},
@@ -231,7 +240,7 @@ var (
 			"size": "40x40",
 			"idiom": "watch",
 			"scale": "2x",
-			"filename": "Icon-40@2x.png",
+			"filename": "AppIcon40@2x.png",
 			"role": "appLauncher",
 			"subtype": "38mm"
 		},
@@ -239,7 +248,7 @@ var (
 			"size": "44x44",
 			"idiom": "watch",
 			"scale": "2x",
-			"filename": "Icon-44@2x.png",
+			"filename": "AppIcon44@2x.png",
 			"role": "longLook",
 			"subtype": "42mm"
 		},
@@ -247,7 +256,7 @@ var (
 			"size": "86x86",
 			"idiom": "watch",
 			"scale": "2x",
-			"filename": "Icon-86@2x.png",
+			"filename": "AppIcon86@2x.png",
 			"role": "quickLook",
 			"subtype": "38mm"
 		},
@@ -255,7 +264,7 @@ var (
 			"size": "98x98",
 			"idiom": "watch",
 			"scale": "2x",
-			"filename": "Icon-98@2x.png",
+			"filename": "AppIcon98@2x.png",
 			"role": "quickLook",
 			"subtype": "42mm"
 		}

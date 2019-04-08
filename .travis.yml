@@ -17,7 +17,7 @@ deploy:
   on:
     repo: dfordsoft/yairc
     tags: true
-skip_cleanup: true
+  skip_cleanup: true
 before_install:
 - sudo apt-get update -qq
 - sudo apt-get install -qq g++-mingw-w64-i686

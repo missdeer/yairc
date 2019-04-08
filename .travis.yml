@@ -9,24 +9,27 @@ env:
 deploy:
   provider: releases
   api_key:
-    secure: KsjKdjAjQef5QAVCmcxGcxYxtdXTHtCFxP9zzMLcU+rLQDiQxbFvzoOw6L+b+CCj4fvVuHvC1Ib+a08ct8ZEsKwE/e0UWBIlx8+Gym2EJAbFHD1GXvKpL5Cn3UqO7KdEx0dXk8WORQLpsPxuWTlGycRBVmT0EdYhPnLBRPbghDQ=
+    secure: cLJ7HSA7GuhnMOeHaUe+VjDKcCYKkYxcMNn36BTdGvRsmaJimtepRYrnr85GqpRYZI0chlkNr+ufy6XoAkFgn4P/ms9A1cObFDnzR19Q7V6S2bV7IA0X550aC3Hlyg6wh61saA04cL31rLkBxKUuyZ3XJXYzQIt5pyjVcqb9OQI=
   file:
-    - yairc-linux-amd64.tar.gz
-    - yairc-windows-amd64.tar.gz
-    - yairc-windows-x86.tar.gz
+  - yairc-linux-amd64.tar.gz
+  - yairc-windows-amd64.tar.gz
+  - yairc-windows-x86.tar.gz
   on:
     repo: dfordsoft/yairc
     tags: true
-  skip_cleanup: true
+skip_cleanup: true
 before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq g++-mingw-w64-i686
-  - sudo apt-get install -qq g++-mingw-w64-x86-64
+- sudo apt-get update -qq
+- sudo apt-get install -qq g++-mingw-w64-i686
+- sudo apt-get install -qq g++-mingw-w64-x86-64
 install:
-  - go get github.com/dfordsoft/yairc
+- go get github.com/dfordsoft/yairc
 script:
-  - pwd && ls -l
-  - env CGO_ENABLED=1 GOARCH=amd64 GOOS=linux go build -ldflags="-s -w"  && tar czvf yairc-linux-amd64.tar.gz yairc
-  - env CGO_ENABLED=1 CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ LD=x86_64-w64-mingw32-ld GOARCH=amd64 GOOS=windows go build  && tar czvf yairc-windows-amd64.tar.gz yairc.exe
-  - env CGO_ENABLED=1 CC=i686-w64-mingw32-gcc CXX=i686-w64-mingw32-g++ LD=i686-w64-mingw32-ld GOARCH=386 GOOS=windows go build  && tar czvf yairc-windows-x86.tar.gz yairc.exe
-  - ls -l
+- pwd && ls -l
+- env CGO_ENABLED=1 GOARCH=amd64 GOOS=linux go build -ldflags="-s -w"  && tar czvf
+  yairc-linux-amd64.tar.gz yairc
+- env CGO_ENABLED=1 CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ LD=x86_64-w64-mingw32-ld
+  GOARCH=amd64 GOOS=windows go build  && tar czvf yairc-windows-amd64.tar.gz yairc.exe
+- env CGO_ENABLED=1 CC=i686-w64-mingw32-gcc CXX=i686-w64-mingw32-g++ LD=i686-w64-mingw32-ld
+  GOARCH=386 GOOS=windows go build  && tar czvf yairc-windows-x86.tar.gz yairc.exe
+- ls -l

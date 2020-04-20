@@ -12,7 +12,7 @@ import (
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/jackmordaunt/icns"
-	flag "github.com/ogier/pflag"
+	flag "github.com/spf13/pflag"
 )
 
 const (

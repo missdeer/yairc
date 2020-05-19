@@ -6,6 +6,8 @@ github.com/jackmordaunt/icns v1.0.0 h1:RYSxplerf/l/DUd09AHtITwckkv/mqjVv4DjYdPmA
 github.com/jackmordaunt/icns v1.0.0/go.mod h1:7TTQVEuGzVVfOPPlLNHJIkzA6CoV7aH1Dv9dW351oOo=
 github.com/missdeer/golib v1.0.2 h1:XFrKHsfataVs5zWLOS2CaJVDFy3hxNJT+kNtZhFMg1c=
 github.com/missdeer/golib v1.0.2/go.mod h1:Cys1ITPPZxIk2eTcQcKT3jDsBdhICAfrrw+ki/eRXxA=
+github.com/missdeer/golib v1.0.3 h1:+kz/tn1lXlPS8i+gjHHVAZC8YcgrmfiMTqELyvOwI4g=
+github.com/missdeer/golib v1.0.3/go.mod h1:Cys1ITPPZxIk2eTcQcKT3jDsBdhICAfrrw+ki/eRXxA=
 github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 h1:zYyBkD/k9seD2A7fsi6Oo2LfFZAehjjQMERAvZLEDnQ=
 github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646/go.mod h1:jpp1/29i3P1S/RLdc7JQKbRpFeM1dOBd8T9ki5s+AY8=
 github.com/oliamb/cutter v0.2.2 h1:Lfwkya0HHNU1YLnGv2hTkzHfasrSMkgv4Dn+5rmlk3k=

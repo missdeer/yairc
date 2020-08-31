@@ -2,6 +2,8 @@ github.com/fsnotify/fsnotify v1.4.9 h1:hsms1Qyu0jgnwNXIxa+/V/PDsU6CfLf6CNO8H7IWo
 github.com/fsnotify/fsnotify v1.4.9/go.mod h1:znqG4EE+3YCdAaPaxE2ZRY/06pZUdp0tY4IgpuI1SZQ=
 github.com/google/uuid v1.1.1 h1:Gkbcsh/GbpXz7lPftLA3P6TYMwjCLYm83jiFQZF/3gY=
 github.com/google/uuid v1.1.1/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
+github.com/google/uuid v1.1.2 h1:EVhdT+1Kseyi1/pUmXKaFxYsDNy9RQYkMWRH68J/W7Y=
+github.com/google/uuid v1.1.2/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/jackmordaunt/icns v1.0.0 h1:RYSxplerf/l/DUd09AHtITwckkv/mqjVv4DjYdPmAMQ=
 github.com/jackmordaunt/icns v1.0.0/go.mod h1:7TTQVEuGzVVfOPPlLNHJIkzA6CoV7aH1Dv9dW351oOo=
 github.com/missdeer/golib v1.0.3 h1:+kz/tn1lXlPS8i+gjHHVAZC8YcgrmfiMTqELyvOwI4g=

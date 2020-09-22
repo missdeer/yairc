@@ -406,16 +406,28 @@ func GenerateAppIcon(origin string) error {
 
 func iconScale(inputFile string, outputDir string) error {
 	if b, e := fsutil.DirExists(outputDir); e != nil || !b {
-		os.MkdirAll(outputDir, 0644)
+		if e = os.MkdirAll(outputDir, 0755); e != nil {
+			log.Fatal(e)
+			return e
+		}
 	}
 	if b, e := fsutil.DirExists(path.Join(outputDir, "x18")); e != nil || !b {
-		os.MkdirAll(path.Join(outputDir, "x18"), 0644)
+		if e = os.MkdirAll(path.Join(outputDir, "x18"), 0755); e != nil {
+			log.Fatal(e)
+			return e
+		}
 	}
 	if b, e := fsutil.DirExists(path.Join(outputDir, "x36")); e != nil || !b {
-		os.MkdirAll(path.Join(outputDir, "x36"), 0644)
+		if e = os.MkdirAll(path.Join(outputDir, "x36"), 0755); e != nil {
+			log.Fatal(e)
+			return e
+		}
 	}
 	if b, e := fsutil.DirExists(path.Join(outputDir, "x48")); e != nil || !b {
-		os.MkdirAll(path.Join(outputDir, "x48"), 0644)
+		if e = os.MkdirAll(path.Join(outputDir, "x48"), 0755); e != nil {
+			log.Fatal(e)
+			return e
+		}
 	}
 	reader, err := os.Open(inputFile)
 	if err != nil {

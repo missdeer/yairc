@@ -1,16 +1,42 @@
 name: Go
 on: [push]
 jobs:
-
-  build:
-    name: Build
-    runs-on: ubuntu-latest
+  Darwin:
+    runs-on: macos-latest
     steps:
-
-    - name: Set up Go 1.14
+    - name: Set up Go 1.15
       uses: actions/setup-go@v1
       with:
-        go-version: 1.14
+        go-version: 1.15
+      id: go
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+      with:
+        ref: master
+
+    - name: Build
+      run: |
+        env CGO_ENABLED=1 GOARCH=amd64 GOOS=darwin go build -ldflags="-s -w"  -o darwin-amd64/yairc
+        env GOPATH=$PWD/gopath go get -u github.com/missdeer/cicdutil
+
+    - name: Upload artifact yairc-darwin-amd64
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        name: yairc-darwin-amd64
+        path: darwin-amd64
+
+    - name: Remove old artifacts
+      run: |
+        gopath/bin/cicdutil -p github -u missdeer -t ${{ secrets.GH_TOKEN }} -r yairc -k 0 -a delete
+
+  WindowsLinux:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set up Go 1.15
+      uses: actions/setup-go@v1
+      with:
+        go-version: 1.15
       id: go
 
     - name: Check out code into the Go module directory
@@ -29,32 +55,21 @@ jobs:
         env CGO_ENABLED=1 GOARCH=amd64 GOOS=linux go build -ldflags="-s -w"  -o linux-amd64/yairc 
         env CGO_ENABLED=1 CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ LD=x86_64-w64-mingw32-ld GOARCH=amd64 GOOS=windows go build  -o windows-amd64/yairc.exe 
         env CGO_ENABLED=1 CC=i686-w64-mingw32-gcc CXX=i686-w64-mingw32-g++ LD=i686-w64-mingw32-ld GOARCH=386 GOOS=windows go build  -o windows-386/yairc.exe
-        env GOPATH=$PWD/gopath go get -u github.com/missdeer/cicdutil
-      
+
     - name: Upload artifact yairc-linux-amd64
       uses: actions/upload-artifact@v1.0.0
       with:
-        # Artifact name
         name: yairc-linux-amd64
-        # Directory containing files to upload
         path: linux-amd64
 
     - name: Upload artifact yairc-windows-amd64
       uses: actions/upload-artifact@v1.0.0
       with:
-        # Artifact name
         name: yairc-windows-amd64
-        # Directory containing files to upload
         path: windows-amd64
 
     - name: Upload artifact yairc-windows-386
       uses: actions/upload-artifact@v1.0.0
       with:
-        # Artifact name
         name: yairc-windows-386
-        # Directory containing files to upload
         path: windows-386
-
-    - name: Remove old artifacts
-      run: |
-        gopath/bin/cicdutil -p github -u missdeer -t ${{ secrets.GH_TOKEN }} -r yairc -k 0 -a delete

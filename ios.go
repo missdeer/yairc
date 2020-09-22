@@ -92,7 +92,7 @@ var (
 		{172, "AppIcon86@2x.png"},
 		{196, "AppIcon98@2x.png"},
 		// App list in iTunes
-		//{512, "iTunesArtwork.png"},
+		// {512, "iTunesArtwork.png"},
 		{1024, "iTunesArtwork@2x.png"},
 	}
 
@@ -405,54 +405,61 @@ func GenerateAppIcon(origin string) error {
 }
 
 func iconScale(inputFile string, outputDir string) error {
-	if b, e := fsutil.FileExists(outputDir); e != nil || !b {
+	if b, e := fsutil.DirExists(outputDir); e != nil || !b {
 		os.MkdirAll(outputDir, 0644)
 	}
-	if b, e := fsutil.FileExists(path.Join(outputDir, "x18")); e != nil || !b {
+	if b, e := fsutil.DirExists(path.Join(outputDir, "x18")); e != nil || !b {
 		os.MkdirAll(path.Join(outputDir, "x18"), 0644)
 	}
-	if b, e := fsutil.FileExists(path.Join(outputDir, "x36")); e != nil || !b {
+	if b, e := fsutil.DirExists(path.Join(outputDir, "x36")); e != nil || !b {
 		os.MkdirAll(path.Join(outputDir, "x36"), 0644)
 	}
-	if b, e := fsutil.FileExists(path.Join(outputDir, "x48")); e != nil || !b {
+	if b, e := fsutil.DirExists(path.Join(outputDir, "x48")); e != nil || !b {
 		os.MkdirAll(path.Join(outputDir, "x48"), 0644)
 	}
 	reader, err := os.Open(inputFile)
 	if err != nil {
-		log.Println(inputFile, err)
+		log.Println(err)
 		return err
 	}
 	defer reader.Close()
 	m, _, err := image.Decode(reader)
 	if err != nil {
-		log.Println(inputFile, err)
+		log.Println(err)
 		return err
 	}
 	infos := []struct {
-		length       uint
-		relativePath string
+		length        uint
+		relativePaths []string
 	}{
-		{24, filepath.Join(outputDir, filepath.Base(inputFile))},
-		{48, filepath.Join(outputDir, filepath.Base(inputFile)[:len(filepath.Base(inputFile))-len(filepath.Ext(inputFile))]+"@2x"+filepath.Ext(inputFile))},
-		{72, filepath.Join(outputDir, filepath.Base(inputFile)[:len(filepath.Base(inputFile))-len(filepath.Ext(inputFile))]+"@3x"+filepath.Ext(inputFile))},
-		{96, filepath.Join(outputDir, filepath.Base(inputFile)[:len(filepath.Base(inputFile))-len(filepath.Ext(inputFile))]+"@4x"+filepath.Ext(inputFile))},
-		{18, filepath.Join(outputDir, "x18", filepath.Base(inputFile))},
-		{36, filepath.Join(outputDir, "x18", filepath.Base(inputFile)[:len(filepath.Base(inputFile))-len(filepath.Ext(inputFile))]+"@2x"+filepath.Ext(inputFile))},
-		{54, filepath.Join(outputDir, "x18", filepath.Base(inputFile)[:len(filepath.Base(inputFile))-len(filepath.Ext(inputFile))]+"@3x"+filepath.Ext(inputFile))},
-		{72, filepath.Join(outputDir, "x18", filepath.Base(inputFile)[:len(filepath.Base(inputFile))-len(filepath.Ext(inputFile))]+"@4x"+filepath.Ext(inputFile))},
-		{36, filepath.Join(outputDir, "x36", filepath.Base(inputFile))},
-		{72, filepath.Join(outputDir, "x36", filepath.Base(inputFile)[:len(filepath.Base(inputFile))-len(filepath.Ext(inputFile))]+"@2x"+filepath.Ext(inputFile))},
-		{108, filepath.Join(outputDir, "x36", filepath.Base(inputFile)[:len(filepath.Base(inputFile))-len(filepath.Ext(inputFile))]+"@3x"+filepath.Ext(inputFile))},
-		{144, filepath.Join(outputDir, "x36", filepath.Base(inputFile)[:len(filepath.Base(inputFile))-len(filepath.Ext(inputFile))]+"@4x"+filepath.Ext(inputFile))},
-		{48, filepath.Join(outputDir, "x48", filepath.Base(inputFile))},
-		{96, filepath.Join(outputDir, "x48", filepath.Base(inputFile)[:len(filepath.Base(inputFile))-len(filepath.Ext(inputFile))]+"@2x"+filepath.Ext(inputFile))},
-		{144, filepath.Join(outputDir, "x48", filepath.Base(inputFile)[:len(filepath.Base(inputFile))-len(filepath.Ext(inputFile))]+"@3x"+filepath.Ext(inputFile))},
-		{192, filepath.Join(outputDir, "x48", filepath.Base(inputFile)[:len(filepath.Base(inputFile))-len(filepath.Ext(inputFile))]+"@4x"+filepath.Ext(inputFile))},
+		{18, []string{filepath.Join(outputDir, "x18", filepath.Base(inputFile))}},
+		{24, []string{filepath.Join(outputDir, filepath.Base(inputFile))}},
+		{36, []string{
+			filepath.Join(outputDir, "x18", filepath.Base(inputFile)[:len(filepath.Base(inputFile))-len(filepath.Ext(inputFile))]+"@2x"+filepath.Ext(inputFile)),
+			filepath.Join(outputDir, "x36", filepath.Base(inputFile))}},
+		{48, []string{
+			filepath.Join(outputDir, filepath.Base(inputFile)[:len(filepath.Base(inputFile))-len(filepath.Ext(inputFile))]+"@2x"+filepath.Ext(inputFile)),
+			filepath.Join(outputDir, "x48", filepath.Base(inputFile))}},
+		{54, []string{filepath.Join(outputDir, "x18", filepath.Base(inputFile)[:len(filepath.Base(inputFile))-len(filepath.Ext(inputFile))]+"@3x"+filepath.Ext(inputFile))}},
+		{72, []string{
+			filepath.Join(outputDir, filepath.Base(inputFile)[:len(filepath.Base(inputFile))-len(filepath.Ext(inputFile))]+"@3x"+filepath.Ext(inputFile)),
+			filepath.Join(outputDir, "x18", filepath.Base(inputFile)[:len(filepath.Base(inputFile))-len(filepath.Ext(inputFile))]+"@4x"+filepath.Ext(inputFile)),
+			filepath.Join(outputDir, "x36", filepath.Base(inputFile)[:len(filepath.Base(inputFile))-len(filepath.Ext(inputFile))]+"@2x"+filepath.Ext(inputFile))}},
+		{96, []string{
+			filepath.Join(outputDir, filepath.Base(inputFile)[:len(filepath.Base(inputFile))-len(filepath.Ext(inputFile))]+"@4x"+filepath.Ext(inputFile)),
+			filepath.Join(outputDir, "x48", filepath.Base(inputFile)[:len(filepath.Base(inputFile))-len(filepath.Ext(inputFile))]+"@2x"+filepath.Ext(inputFile))}},
+		{108, []string{filepath.Join(outputDir, "x36", filepath.Base(inputFile)[:len(filepath.Base(inputFile))-len(filepath.Ext(inputFile))]+"@3x"+filepath.Ext(inputFile))}},
+		{144, []string{
+			filepath.Join(outputDir, "x36", filepath.Base(inputFile)[:len(filepath.Base(inputFile))-len(filepath.Ext(inputFile))]+"@4x"+filepath.Ext(inputFile)),
+			filepath.Join(outputDir, "x48", filepath.Base(inputFile)[:len(filepath.Base(inputFile))-len(filepath.Ext(inputFile))]+"@3x"+filepath.Ext(inputFile))}},
+		{192, []string{filepath.Join(outputDir, "x48", filepath.Base(inputFile)[:len(filepath.Base(inputFile))-len(filepath.Ext(inputFile))]+"@4x"+filepath.Ext(inputFile))}},
 	}
 	for _, info := range infos {
 		im := resize.Resize(info.length, info.length, m, resize.Bilinear)
-		if err := saveImage(&im, info.relativePath, 1); err != nil {
-			log.Println(info.relativePath, err)
+		for _, relativePath := range info.relativePaths {
+			if err := saveImage(&im, relativePath, 1); err != nil {
+				log.Println(err)
+			}
 		}
 	}
 	return nil

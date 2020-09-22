@@ -33,7 +33,7 @@ func (c *Circle) At(x, y int) color.Color {
 	return color.Alpha{0}
 }
 
-//draw.DrawMask(dst, dst.Bounds(), src, image.ZP, &Circle{p, r}, image.ZP, draw.Over)
+// draw.DrawMask(dst, dst.Bounds(), src, image.ZP, &Circle{p, r}, image.ZP, draw.Over)
 
 func isDir(path string) (bool, error) {
 	f, err := os.OpenFile(path, os.O_RDONLY, 0644)
@@ -98,7 +98,7 @@ func saveImage(img *image.Image, savePath string, imagetype int) (err error) {
 	}
 
 	if err != nil {
-		log.Println(savePath, err)
+		log.Println(err)
 		return err
 	}
 	return nil

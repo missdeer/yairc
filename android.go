@@ -1,13 +1,10 @@
 package main
 
 import (
-	"github.com/nfnt/resize"
-	"image"
-	_ "image/gif"
-	_ "image/jpeg"
-	_ "image/png"
 	"log"
 	"os"
+
+	"github.com/nfnt/resize"
 )
 
 type SplashScreenSpec struct {
@@ -50,7 +47,7 @@ func GenerateLauncherIcon(origin string) error {
 		return err
 	}
 	defer reader.Close()
-	m, _, err := image.Decode(reader)
+	m, _, err := ImageDecode(reader)
 	if err != nil {
 		log.Println(origin, err)
 		return err
@@ -58,7 +55,7 @@ func GenerateLauncherIcon(origin string) error {
 
 	for _, spec := range LauncherIconSpecifications {
 		im := resize.Resize(uint(spec.Length), uint(spec.Length), m, resize.Bilinear)
-		if err := saveImage(&im, spec.Name, 1); err != nil {
+		if err := saveImage(&im, spec.Name, it_png); err != nil {
 			log.Println(spec.Name, err)
 		}
 	}

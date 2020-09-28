@@ -4,9 +4,6 @@ import (
 	"image"
 	"image/color"
 	"image/draw"
-	_ "image/gif"
-	_ "image/jpeg"
-	_ "image/png"
 	"log"
 	"os"
 	"path"
@@ -333,7 +330,7 @@ func GenerateLaunchImage() error {
 		return err
 	}
 	defer reader.Close()
-	bm, _, err := image.Decode(reader)
+	bm, _, err := ImageDecode(reader)
 	if err != nil {
 		log.Println(backgroundImagePath, err)
 		return err
@@ -345,7 +342,7 @@ func GenerateLaunchImage() error {
 		return err
 	}
 	defer reader.Close()
-	fm, _, err := image.Decode(reader)
+	fm, _, err := ImageDecode(reader)
 	if err != nil {
 		log.Println(foregroundImagePath, err)
 		return err
@@ -369,7 +366,7 @@ func GenerateAppIcon(origin string) error {
 		return err
 	}
 	defer reader.Close()
-	m, _, err := image.Decode(reader)
+	m, _, err := ImageDecode(reader)
 	if err != nil {
 		log.Println(origin, err)
 		return err
@@ -390,7 +387,7 @@ func GenerateAppIcon(origin string) error {
 	os.Mkdir("appicon/ios/Images.xcassets/AppIcon.appiconset", 0755)
 	for _, spec := range appIconSpecifications {
 		im := resize.Resize(uint(spec.Length), uint(spec.Length), bm, resize.Bilinear)
-		if err := saveImage(&im, "appicon/ios/Images.xcassets/AppIcon.appiconset/"+spec.Name, 1); err != nil {
+		if err := saveImage(&im, "appicon/ios/Images.xcassets/AppIcon.appiconset/"+spec.Name, it_png); err != nil {
 			log.Println(spec.Name, err)
 		}
 	}
@@ -435,7 +432,7 @@ func iconScale(inputFile string, outputDir string) error {
 		return err
 	}
 	defer reader.Close()
-	m, _, err := image.Decode(reader)
+	m, _, err := ImageDecode(reader)
 	if err != nil {
 		log.Println(err)
 		return err
@@ -469,7 +466,7 @@ func iconScale(inputFile string, outputDir string) error {
 	for _, info := range infos {
 		im := resize.Resize(info.length, info.length, m, resize.Bilinear)
 		for _, relativePath := range info.relativePaths {
-			if err := saveImage(&im, relativePath, 1); err != nil {
+			if err := saveImage(&im, relativePath, it_png); err != nil {
 				log.Println(err)
 			}
 		}
@@ -486,7 +483,7 @@ func iOSScale(origin string, templateSize string) error {
 			return err
 		}
 		defer reader.Close()
-		m, _, err := image.Decode(reader)
+		m, _, err := ImageDecode(reader)
 		if err != nil {
 			log.Println(origin, err)
 			return err
@@ -494,13 +491,13 @@ func iOSScale(origin string, templateSize string) error {
 
 		name := filepath.Join(filepath.Dir(origin), filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))]+"@2x"+filepath.Ext(origin))
 		im := resize.Resize(uint(m.Bounds().Size().X*2), uint(m.Bounds().Size().Y*2), m, resize.Bilinear)
-		if err := saveImage(&im, name, 1); err != nil {
+		if err := saveImage(&im, name, it_png); err != nil {
 			log.Println(name, err)
 		}
 
 		name = filepath.Join(filepath.Dir(origin), filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))]+"@3x"+filepath.Ext(origin))
 		im = resize.Resize(uint(m.Bounds().Size().X*3), uint(m.Bounds().Size().Y*3), m, resize.Bilinear)
-		if err := saveImage(&im, name, 1); err != nil {
+		if err := saveImage(&im, name, it_png); err != nil {
 			log.Println(name, err)
 		}
 	case "2x":
@@ -522,19 +519,19 @@ func iOSScale(origin string, templateSize string) error {
 			return err
 		}
 		defer reader.Close()
-		m, _, err := image.Decode(reader)
+		m, _, err := ImageDecode(reader)
 		if err != nil {
 			log.Println(two, err)
 			return err
 		}
 
 		im := resize.Resize(uint(m.Bounds().Size().X/2), uint(m.Bounds().Size().Y/2), m, resize.Bilinear)
-		if err := saveImage(&im, one, 1); err != nil {
+		if err := saveImage(&im, one, it_png); err != nil {
 			log.Println(one, err)
 		}
 
 		im = resize.Resize(uint(m.Bounds().Size().X*3/2), uint(m.Bounds().Size().Y*3/2), m, resize.Bilinear)
-		if err := saveImage(&im, three, 1); err != nil {
+		if err := saveImage(&im, three, it_png); err != nil {
 			log.Println(three, err)
 		}
 	case "3x":
@@ -556,19 +553,19 @@ func iOSScale(origin string, templateSize string) error {
 			return err
 		}
 		defer reader.Close()
-		m, _, err := image.Decode(reader)
+		m, _, err := ImageDecode(reader)
 		if err != nil {
 			log.Println(three, err)
 			return err
 		}
 
 		im := resize.Resize(uint(m.Bounds().Size().X/3), uint(m.Bounds().Size().Y/3), m, resize.Bilinear)
-		if err := saveImage(&im, one, 1); err != nil {
+		if err := saveImage(&im, one, it_png); err != nil {
 			log.Println(one, err)
 		}
 
 		im = resize.Resize(uint(m.Bounds().Size().X*2/3), uint(m.Bounds().Size().Y*2/3), m, resize.Bilinear)
-		if err := saveImage(&im, two, 1); err != nil {
+		if err := saveImage(&im, two, it_png); err != nil {
 			log.Println(two, err)
 		}
 	default:

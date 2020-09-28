@@ -3,13 +3,24 @@ package main
 import (
 	"image"
 	"image/color"
+	"image/gif"
 	_ "image/gif"
 	"image/jpeg"
 	_ "image/jpeg"
 	"image/png"
 	_ "image/png"
+	"io"
 	"log"
 	"os"
+
+	"github.com/chai2010/webp"
+)
+
+const (
+	it_png = iota
+	it_jpeg
+	it_gif
+	it_webp
 )
 
 type Circle struct {
@@ -52,7 +63,7 @@ func isDir(path string) (bool, error) {
 	return fi.IsDir(), nil
 }
 
-func saveRGBA(rgba *image.RGBA, savePath string, imagetype int) (err error) {
+func saveRGBA(rgba *image.RGBA, savePath string, imageType int) (err error) {
 	var file *os.File
 	if f, err := os.OpenFile(savePath, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0644); err != nil {
 		log.Fatal(savePath, err)
@@ -61,14 +72,19 @@ func saveRGBA(rgba *image.RGBA, savePath string, imagetype int) (err error) {
 	}
 	defer file.Close()
 
-	switch imagetype {
-	case 1:
+	switch imageType {
+	case it_png:
 		err = png.Encode(file, rgba)
 		if err == nil && compress == true {
 			err = crush(savePath)
 		}
-	default:
+	case it_jpeg:
 		err = jpeg.Encode(file, rgba, &jpeg.Options{Quality: 100})
+	case it_gif:
+		err = gif.Encode(file, rgba, &gif.Options{})
+	case it_webp:
+		err = webp.Encode(file, rgba, &webp.Options{Lossless: true})
+	default:
 	}
 
 	if err != nil {
@@ -78,7 +94,7 @@ func saveRGBA(rgba *image.RGBA, savePath string, imagetype int) (err error) {
 	return nil
 }
 
-func saveImage(img *image.Image, savePath string, imagetype int) (err error) {
+func saveImage(img *image.Image, savePath string, imageType int) (err error) {
 	var file *os.File
 	if f, err := os.OpenFile(savePath, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0644); err != nil {
 		log.Fatal(savePath, err)
@@ -87,14 +103,19 @@ func saveImage(img *image.Image, savePath string, imagetype int) (err error) {
 	}
 	defer file.Close()
 
-	switch imagetype {
-	case 1:
+	switch imageType {
+	case it_png:
 		err = png.Encode(file, *img)
 		if err == nil && compress == true {
 			err = crush(savePath)
 		}
-	default:
+	case it_jpeg:
 		err = jpeg.Encode(file, *img, &jpeg.Options{Quality: 100})
+	case it_gif:
+		err = gif.Encode(file, *img, &gif.Options{})
+	case it_webp:
+		err = webp.Encode(file, *img, &webp.Options{Lossless: true})
+	default:
 	}
 
 	if err != nil {
@@ -102,4 +123,12 @@ func saveImage(img *image.Image, savePath string, imagetype int) (err error) {
 		return err
 	}
 	return nil
+}
+
+func ImageDecode(r io.Reader) (image.Image, string, error) {
+	m, err := webp.Decode(r)
+	if err != nil {
+		return image.Decode(r)
+	}
+	return m, "webp", err
 }

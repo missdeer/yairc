@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"image"
 	"log"
 	"os"
 	"path/filepath"
@@ -84,7 +83,7 @@ func main() {
 			log.Fatalf("opening source image: %v", err)
 		}
 		defer pngf.Close()
-		srcImg, _, err := image.Decode(pngf)
+		srcImg, _, err := ImageDecode(pngf)
 		if err != nil {
 			log.Fatalf("decoding source image: %v", err)
 		}

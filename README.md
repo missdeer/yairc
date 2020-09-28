@@ -26,13 +26,13 @@ YAIRC - Yet Another Image Resizer & Cutter, formerly known as TaobaoMobileImageR
 #### 生成iOS launch images：准备一个足够大小的背景图片模板background.png，因为最大的iOS设备是iPad Pro 12"，将使用2048 * 2732大小的launch image，再准备一个足够大的前景图片模板foreground.png，建议至少512 * 512。程序会自动按比例缩放和剪裁图片。
 
 ```bash
-./yairc --action=launchImage --os=ios -b background.png -f foreground 
+./yairc --action=launchImage --platform=ios -b background.png -f foreground 
 ```
 
 #### 生成iOS app icons：准备一个1024*1024大小的图片模板template.png
 
 ```bash
-./yairc --action=appIcon --os=ios --input=template.png
+./yairc --action=appIcon --platform=ios --input=template.png
 ```
 
 #### 生成icns文件

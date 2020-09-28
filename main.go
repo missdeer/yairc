@@ -49,10 +49,9 @@ func main() {
 	}
 
 	if showVersion {
-		fmt.Println("Hannah version:", GitCommit)
+		fmt.Println("yairc version:", GitCommit)
 		return
 	}
-	args := flag.Args()
 
 	// icon scale mode
 	if action == "icons" && inputImagePath != "" && outputDirectoryPath != "" {
@@ -64,9 +63,7 @@ func main() {
 	// ios app icon mode
 	if action == "appIcon" && platform == "ios" {
 		fmt.Println("output ios app icons")
-		for _, root := range args {
-			GenerateAppIcon(root)
-		}
+		GenerateAppIcon(inputImagePath)
 		return
 	}
 
@@ -75,6 +72,19 @@ func main() {
 		GenerateLaunchImage()
 		return
 	}
+
+	if action == "appIcon" && platform == "android" {
+		fmt.Println("output android launcher icons")
+		GenerateLauncherIcon(inputImagePath)
+		return
+	}
+
+	if action == "launchImage" && platform == "ios" {
+		fmt.Println("output android splash screen images")
+		GenerateSplashScreen(inputImagePath)
+		return
+	}
+
 
 	// convert to .icns file
 	if action == "icns" && inputImagePath != "" {
@@ -100,18 +110,4 @@ func main() {
 		return
 	}
 
-	if action == "appIcon" && platform == "android" {
-		fmt.Println("output android launcher icons")
-		for _, root := range args {
-			GenerateLauncherIcon(root)
-		}
-		return
-	}
-
-	if action == "launchImage" && platform == "ios" {
-		fmt.Println("output android splash screen images")
-		for _, root := range args {
-			GenerateSplashScreen(root)
-		}
-	}
 }

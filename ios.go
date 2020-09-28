@@ -348,10 +348,13 @@ func GenerateLaunchImage() error {
 		return err
 	}
 
-	os.Mkdir("launchimage", 0755)
-	os.Mkdir("launchimage/ios", 0755)
+	err = os.MkdirAll(path.Join(outputDirectoryPath, "launchimage", "ios"), 0755)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
 	for _, spec := range launchImageSpecifications {
-		savePath := "launchimage/ios/" + spec.Postfix
+		savePath := path.Join(outputDirectoryPath, "launchimage", "ios", spec.Postfix)
 
 		log.Println("generating ", savePath)
 		spec.Handler(bm, fm, savePath, &spec)
@@ -381,18 +384,15 @@ func GenerateAppIcon(origin string) error {
 	draw.Draw(bm, bm.Bounds(), &image.Uniform{white}, image.ZP, draw.Src)
 	draw.Draw(bm, image.Rect(origLength/10, origLength/10, origLength/10+length, origLength/10+length), m, image.Point{0, 0}, draw.Over)
 
-	os.Mkdir("appicon", 0755)
-	os.Mkdir("appicon/ios", 0755)
-	os.Mkdir("appicon/ios/Images.xcassets", 0755)
-	os.Mkdir("appicon/ios/Images.xcassets/AppIcon.appiconset", 0755)
+	os.MkdirAll(path.Join(outputDirectoryPath, "appicon", "ios", "Images.xcassets", "AppIcon.appiconset"), 0755)
 	for _, spec := range appIconSpecifications {
 		im := resize.Resize(uint(spec.Length), uint(spec.Length), bm, resize.Bilinear)
-		if err := saveImage(&im, "appicon/ios/Images.xcassets/AppIcon.appiconset/"+spec.Name, it_png); err != nil {
+		if err := saveImage(&im, path.Join(outputDirectoryPath, "appicon", "ios", "Images.xcassets", "AppIcon.appiconset", spec.Name), it_png); err != nil {
 			log.Println(spec.Name, err)
 		}
 	}
 
-	fd, err := os.OpenFile("appicon/ios/Images.xcassets/AppIcon.appiconset/Contents.json", os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+	fd, err := os.OpenFile(filepath.Join(outputDirectoryPath, "appicon", "ios", "Images.xcassets", "AppIcon.appiconset", "Contents.json"), os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
 	if err != nil {
 		log.Fatalln(err)
 	}

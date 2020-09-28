@@ -126,9 +126,10 @@ func saveImage(img *image.Image, savePath string, imageType int) (err error) {
 }
 
 func ImageDecode(r io.Reader) (image.Image, string, error) {
-	m, err := webp.Decode(r)
+	m, res, err := image.Decode(r)
 	if err != nil {
-		return image.Decode(r)
+		m, err = webp.Decode(r)
+		return m, "webp", err
 	}
-	return m, "webp", err
+	return m, res, err
 }

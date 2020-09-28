@@ -466,7 +466,8 @@ func iconScale(inputFile string, outputDir string) error {
 	for _, info := range infos {
 		im := resize.Resize(info.length, info.length, m, resize.Bilinear)
 		for _, relativePath := range info.relativePaths {
-			if err := saveImage(&im, relativePath, it_png); err != nil {
+			fn := relativePath[:len(relativePath)-len(filepath.Ext(relativePath))] + ".png"
+			if err := saveImage(&im, fn, it_png); err != nil {
 				log.Println(err)
 			}
 		}

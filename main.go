@@ -42,7 +42,7 @@ func main() {
 	flag.Uint32VarP(&blue, "blue", "", blue, "set blue threshold")
 	flag.BoolVarP(&compress, "compress", "", true, "compress output PNG files")
 	flag.StringVarP(&platform, "platform", "p", "common", "candidates: ios, android, common")
-	flag.StringVarP(&action, "action", "a", "", "candidats: icons, icns, appIcon, launchImage, traverseColor")
+	flag.StringVarP(&action, "action", "a", "", "candidats: icons, icns, appIcon, launchImage, transparent")
 	flag.StringVarP(&backgroundImagePath, "background", "b", "", "path of background image for launch image")
 	flag.StringVarP(&foregroundImagePath, "foreground", "f", "", "path of foreground image for launch image")
 	flag.StringVarP(&inputImagePath, "input", "i", "", "input image path")
@@ -61,8 +61,8 @@ func main() {
 		return
 	}
 
-	if action == "traverseColor" && inputImagePath != "" {
-		log.Println("traverse color")
+	if action == "transparent" && inputImagePath != "" {
+		log.Println("transparent color")
 		r, err := OpenURI(inputImagePath)
 		if err != nil {
 			log.Fatal(err)

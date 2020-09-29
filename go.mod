@@ -3,6 +3,7 @@ module github.com/missdeer/yairc
 go 1.14
 
 require (
+	github.com/andybalholm/brotli v1.0.0
 	github.com/chai2010/webp v1.1.0
 	github.com/google/uuid v1.1.2
 	github.com/jackmordaunt/icns v1.0.0

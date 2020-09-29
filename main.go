@@ -100,7 +100,7 @@ func main() {
 
 	// convert to .icns file
 	if action == "icns" && inputImagePath != "" {
-		pngf, err := os.Open(inputImagePath)
+		pngf, err := OpenURI(inputImagePath)
 		if err != nil {
 			log.Fatalf("opening source image: %v", err)
 		}

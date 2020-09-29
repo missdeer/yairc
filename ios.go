@@ -325,7 +325,7 @@ func BackgroundForegroundHandler(bm image.Image, fm image.Image, savePath string
 
 func GenerateLaunchImage() (err error) {
 	var bm image.Image
-	reader, err := os.Open(backgroundImagePath)
+	reader, err := OpenURI(backgroundImagePath)
 	if err == nil {
 		bm, _, err = ImageDecode(reader)
 		reader.Close()
@@ -346,7 +346,7 @@ func GenerateLaunchImage() (err error) {
 		bm = img.SubImage(image.Rect(0, 0, width, height))
 	}
 
-	reader, err = os.Open(foregroundImagePath)
+	reader, err = OpenURI(foregroundImagePath)
 	if err != nil {
 		return err
 	}
@@ -370,7 +370,7 @@ func GenerateLaunchImage() (err error) {
 }
 
 func GenerateAppIcon(origin string) error {
-	reader, err := os.Open(origin)
+	reader, err := OpenURI(origin)
 	if err != nil {
 		log.Println(origin, err)
 		return err
@@ -387,8 +387,7 @@ func GenerateAppIcon(origin string) error {
 	m = resize.Resize(uint(length), uint(length), m, resize.Bilinear)
 
 	bm := image.NewRGBA(image.Rect(0, 0, origLength, origLength))
-	white := color.RGBA{255, 255, 255, 255}
-	draw.Draw(bm, bm.Bounds(), &image.Uniform{white}, image.ZP, draw.Src)
+	draw.Draw(bm, bm.Bounds(), &image.Uniform{color.White}, image.ZP, draw.Src)
 	draw.Draw(bm, image.Rect(origLength/10, origLength/10, origLength/10+length, origLength/10+length), m, image.Point{0, 0}, draw.Over)
 
 	os.MkdirAll(path.Join(outputDirectoryPath, "appicon", "ios", "Images.xcassets", "AppIcon.appiconset"), 0755)
@@ -433,7 +432,7 @@ func iconScale(inputFile string, outputDir string) error {
 			return e
 		}
 	}
-	reader, err := os.Open(inputFile)
+	reader, err := OpenURI(inputFile)
 	if err != nil {
 		log.Println(err)
 		return err
@@ -485,7 +484,7 @@ func iconScale(inputFile string, outputDir string) error {
 func iOSScale(origin string, templateSize string) error {
 	switch templateSize {
 	case "1x":
-		reader, err := os.Open(origin)
+		reader, err := OpenURI(origin)
 		if err != nil {
 			log.Println(origin, err)
 			return err
@@ -521,7 +520,7 @@ func iOSScale(origin string, templateSize string) error {
 			three = filepath.Join(filepath.Dir(origin), filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))-3]+"@3x"+filepath.Ext(origin))
 		}
 
-		reader, err := os.Open(two)
+		reader, err := OpenURI(two)
 		if err != nil {
 			log.Println(two, err)
 			return err
@@ -555,7 +554,7 @@ func iOSScale(origin string, templateSize string) error {
 			three = origin
 		}
 
-		reader, err := os.Open(three)
+		reader, err := OpenURI(three)
 		if err != nil {
 			log.Println(three, err)
 			return err

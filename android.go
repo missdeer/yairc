@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"os"
 
 	"github.com/nfnt/resize"
 )
@@ -41,7 +40,7 @@ func GenerateSplashScreen(origin string) error {
 }
 
 func GenerateLauncherIcon(origin string) error {
-	reader, err := os.Open(origin)
+	reader, err := OpenURI(origin)
 	if err != nil {
 		log.Println(origin, err)
 		return err

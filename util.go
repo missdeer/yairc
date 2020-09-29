@@ -21,6 +21,7 @@ import (
 	"strings"
 
 	"github.com/andybalholm/brotli"
+	"github.com/chai2010/tiff"
 	"github.com/chai2010/webp"
 )
 
@@ -29,6 +30,7 @@ const (
 	it_jpeg
 	it_gif
 	it_webp
+	it_tiff
 )
 
 type Circle struct {
@@ -92,6 +94,8 @@ func saveRGBA(rgba *image.RGBA, savePath string, imageType int) (err error) {
 		err = gif.Encode(file, rgba, &gif.Options{})
 	case it_webp:
 		err = webp.Encode(file, rgba, &webp.Options{Lossless: true})
+	case it_tiff:
+		err = tiff.Encode(file, rgba, &tiff.Options{})
 	default:
 	}
 
@@ -123,6 +127,8 @@ func saveImage(img *image.Image, savePath string, imageType int) (err error) {
 		err = gif.Encode(file, *img, &gif.Options{})
 	case it_webp:
 		err = webp.Encode(file, *img, &webp.Options{Lossless: true})
+	case it_tiff:
+		err = tiff.Encode(file, *img, &tiff.Options{})
 	default:
 	}
 
@@ -134,12 +140,7 @@ func saveImage(img *image.Image, savePath string, imageType int) (err error) {
 }
 
 func ImageDecode(r io.Reader) (image.Image, string, error) {
-	m, res, err := image.Decode(r)
-	if err != nil {
-		m, err = webp.Decode(r)
-		return m, "webp", err
-	}
-	return m, res, err
+	return image.Decode(r)
 }
 
 func uncompressReader(r *http.Response) (io.ReadCloser, bool, error) {

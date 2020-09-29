@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"image/color"
+	"image/draw"
 	"log"
 	"os"
 	"path/filepath"
@@ -25,6 +27,9 @@ var (
 	action              string
 	platform            = "ios"
 
+	red   uint32 = 127
+	green uint32 = 127
+	blue  uint32 = 127
 	// Gitcommit contains the commit where we built from.
 	GitCommit string
 )
@@ -32,9 +37,12 @@ var (
 func main() {
 	showHelpMessage := false
 	showVersion := false
+	flag.Uint32VarP(&red, "red", "", red, "set red threshold")
+	flag.Uint32VarP(&green, "green", "", green, "set green threshold")
+	flag.Uint32VarP(&blue, "blue", "", blue, "set blue threshold")
 	flag.BoolVarP(&compress, "compress", "", true, "compress output PNG files")
 	flag.StringVarP(&platform, "platform", "p", "common", "candidates: ios, android, common")
-	flag.StringVarP(&action, "action", "a", "", "candidats: icons, icns, appIcon, launchImage")
+	flag.StringVarP(&action, "action", "a", "", "candidats: icons, icns, appIcon, launchImage, traverseColor")
 	flag.StringVarP(&backgroundImagePath, "background", "b", "", "path of background image for launch image")
 	flag.StringVarP(&foregroundImagePath, "foreground", "f", "", "path of foreground image for launch image")
 	flag.StringVarP(&inputImagePath, "input", "i", "", "input image path")
@@ -50,6 +58,44 @@ func main() {
 
 	if showVersion {
 		fmt.Println("yairc version:", GitCommit)
+		return
+	}
+
+	if action == "traverseColor" && inputImagePath != "" {
+		log.Println("traverse color")
+		r, err := OpenURI(inputImagePath)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer r.Close()
+		im, format, err := ImageDecode(r)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Println("found format:", format)
+		img, ok := im.(draw.Image)
+		if !ok {
+			log.Fatal("not a drawable image type")
+		}
+		rc := img.Bounds()
+		cm := make(map[color.Color]int)
+		for x := 0; x < rc.Dx(); x++ {
+			for y := 0; y < rc.Dy(); y++ {
+				c := img.At(x, y)
+				r, g, b, _ := c.RGBA()
+				if r > red && g > green && b > blue {
+					img.Set(x, y, color.Transparent)
+				}
+				cm[c]++
+			}
+		}
+		for clr, count := range cm {
+			fmt.Println(clr, count)
+		}
+		err = saveImage(&im, inputImagePath+".transparent.png", it_png)
+		if err != nil {
+			log.Fatal(err)
+		}
 		return
 	}
 

@@ -97,10 +97,10 @@ func saveRGBA(rgba *image.RGBA, savePath string, imageType int) (err error) {
 	case it_tiff:
 		err = tiff.Encode(file, rgba, &tiff.Options{})
 	default:
+		err = errors.New("unsupported format")
 	}
 
 	if err != nil {
-		log.Println(savePath, err)
 		return err
 	}
 	return nil
@@ -130,10 +130,10 @@ func saveImage(img *image.Image, savePath string, imageType int) (err error) {
 	case it_tiff:
 		err = tiff.Encode(file, *img, &tiff.Options{})
 	default:
+		err = errors.New("unsupported format")
 	}
 
 	if err != nil {
-		log.Println(err)
 		return err
 	}
 	return nil

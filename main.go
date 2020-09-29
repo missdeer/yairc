@@ -63,28 +63,40 @@ func main() {
 	// ios app icon mode
 	if action == "appIcon" && platform == "ios" {
 		fmt.Println("output ios app icons")
-		GenerateAppIcon(inputImagePath)
+		err := GenerateAppIcon(inputImagePath)
+		if err != nil {
+			log.Fatal(err)
+		}
 		return
 	}
 
 	// ios launch image mode
 	if action == "launchImage" && platform == "ios" {
-		GenerateLaunchImage()
+		fmt.Println("output ios launch images")
+		err := GenerateLaunchImage()
+		if err != nil {
+			log.Fatal(err)
+		}
 		return
 	}
 
 	if action == "appIcon" && platform == "android" {
 		fmt.Println("output android launcher icons")
-		GenerateLauncherIcon(inputImagePath)
+		err := GenerateLauncherIcon(inputImagePath)
+		if err != nil {
+			log.Fatal(err)
+		}
 		return
 	}
 
 	if action == "launchImage" && platform == "ios" {
 		fmt.Println("output android splash screen images")
-		GenerateSplashScreen(inputImagePath)
+		err := GenerateSplashScreen(inputImagePath)
+		if err != nil {
+			log.Fatal(err)
+		}
 		return
 	}
-
 
 	// convert to .icns file
 	if action == "icns" && inputImagePath != "" {

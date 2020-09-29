@@ -323,34 +323,41 @@ func BackgroundForegroundHandler(bm image.Image, fm image.Image, savePath string
 	return nil
 }
 
-func GenerateLaunchImage() error {
+func GenerateLaunchImage() (err error) {
+	var bm image.Image
 	reader, err := os.Open(backgroundImagePath)
-	if err != nil {
-		log.Println(backgroundImagePath, err)
-		return err
+	if err == nil {
+		bm, _, err = ImageDecode(reader)
+		reader.Close()
 	}
-	defer reader.Close()
-	bm, _, err := ImageDecode(reader)
+
 	if err != nil {
-		log.Println(backgroundImagePath, err)
-		return err
+		width := 2
+		height := 2
+
+		upLeft := image.Point{0, 0}
+		lowRight := image.Point{width, height}
+		img := image.NewRGBA(image.Rectangle{upLeft, lowRight})
+		for x := 0; x < width; x++ {
+			for y := 0; y < height; y++ {
+				img.Set(x, y, color.White)
+			}
+		}
+		bm = img.SubImage(image.Rect(0, 0, width, height))
 	}
 
 	reader, err = os.Open(foregroundImagePath)
 	if err != nil {
-		log.Println(foregroundImagePath, err)
 		return err
 	}
 	defer reader.Close()
 	fm, _, err := ImageDecode(reader)
 	if err != nil {
-		log.Println(foregroundImagePath, err)
 		return err
 	}
 
 	err = os.MkdirAll(path.Join(outputDirectoryPath, "launchimage", "ios"), 0755)
 	if err != nil {
-		log.Println(err)
 		return err
 	}
 	for _, spec := range launchImageSpecifications {

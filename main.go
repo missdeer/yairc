@@ -13,24 +13,17 @@ import (
 	flag "github.com/spf13/pflag"
 )
 
-const (
-	MaxWidth  int = 620
-	MaxHeight int = 960
-)
-
 var (
 	compress            bool
-	imageDirectory      string
 	backgroundImagePath string
 	foregroundImagePath string
 	inputImagePath      string
 	outputDirectoryPath string
 	action              string
-	platform            = "ios"
-
-	red   uint32 = 127
-	green uint32 = 127
-	blue  uint32 = 127
+	platform                   = "ios"
+	red                 uint32 = 127
+	green               uint32 = 127
+	blue                uint32 = 127
 	// Gitcommit contains the commit where we built from.
 	GitCommit string
 )
@@ -94,7 +87,7 @@ func main() {
 			fmt.Println(clr, count)
 		}
 		fn := inputImagePath[:len(inputImagePath)-len(filepath.Ext(inputImagePath))] + ".transparent.png"
-		if err = util.SaveImage(&im, fn, util.IT_png); err != nil {
+		if err = util.SaveImage(im, fn, util.IT_png); err != nil {
 			log.Fatal(err)
 		}
 		if err = util.DoCrush(compress, fn); err != nil {
@@ -106,7 +99,7 @@ func main() {
 	// icon scale mode
 	if action == "icons" && inputImagePath != "" && outputDirectoryPath != "" {
 		log.Println("generate /@2x/@3x/@4x & /x18/x36/x48 icons from", inputImagePath, "to", outputDirectoryPath)
-		err :=iconScale(inputImagePath, outputDirectoryPath)
+		err := iconScale(inputImagePath, outputDirectoryPath)
 		if err != nil {
 			log.Fatal(err)
 		}

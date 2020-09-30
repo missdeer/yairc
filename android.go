@@ -55,7 +55,7 @@ func GenerateLauncherIcon(origin string) error {
 
 	for _, spec := range LauncherIconSpecifications {
 		im := resize.Resize(uint(spec.Length), uint(spec.Length), m, resize.Bilinear)
-		if err := util.SaveImage(&im, spec.Name, util.IT_png); err != nil {
+		if err := util.SaveImage(im, spec.Name, util.IT_png); err != nil {
 			log.Println(spec.Name, err)
 			continue
 		}

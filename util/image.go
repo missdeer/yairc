@@ -25,9 +25,13 @@ const (
 	IT_tiff
 )
 
+var (
+	err_unsupported_format = errors.New("unsupported format")
+)
+
 // draw.DrawMask(dst, dst.Bounds(), src, image.ZP, &Circle{p, r}, image.ZP, draw.Over)
 
-func SaveRGBA(rgba *image.RGBA, savePath string, imageType int) (err error) {
+func SaveImage(img image.Image, savePath string, imageType int) (err error) {
 	var file *os.File
 	if f, err := os.OpenFile(savePath, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0644); err != nil {
 		log.Fatal(savePath, err)
@@ -38,53 +42,20 @@ func SaveRGBA(rgba *image.RGBA, savePath string, imageType int) (err error) {
 
 	switch imageType {
 	case IT_png:
-		err = png.Encode(file, rgba)
+		err = png.Encode(file, img)
 	case IT_jpeg:
-		err = jpeg.Encode(file, rgba, &jpeg.Options{Quality: 100})
+		err = jpeg.Encode(file, img, &jpeg.Options{Quality: 100})
 	case IT_gif:
-		err = gif.Encode(file, rgba, &gif.Options{})
+		err = gif.Encode(file, img, &gif.Options{})
 	case IT_webp:
-		err = webp.Encode(file, rgba, &webp.Options{Lossless: true})
+		err = webp.Encode(file, img, &webp.Options{Lossless: true})
 	case IT_tiff:
-		err = tiff.Encode(file, rgba, &tiff.Options{})
+		err = tiff.Encode(file, img, &tiff.Options{})
 	default:
-		err = errors.New("unsupported format")
+		err = err_unsupported_format
 	}
 
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func SaveImage(img *image.Image, savePath string, imageType int) (err error) {
-	var file *os.File
-	if f, err := os.OpenFile(savePath, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0644); err != nil {
-		log.Fatal(savePath, err)
-	} else {
-		file = f
-	}
-	defer file.Close()
-
-	switch imageType {
-	case IT_png:
-		err = png.Encode(file, *img)
-	case IT_jpeg:
-		err = jpeg.Encode(file, *img, &jpeg.Options{Quality: 100})
-	case IT_gif:
-		err = gif.Encode(file, *img, &gif.Options{})
-	case IT_webp:
-		err = webp.Encode(file, *img, &webp.Options{Lossless: true})
-	case IT_tiff:
-		err = tiff.Encode(file, *img, &tiff.Options{})
-	default:
-		err = errors.New("unsupported format")
-	}
-
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 func ImageDecode(r io.Reader) (image.Image, string, error) {

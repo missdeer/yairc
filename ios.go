@@ -320,7 +320,7 @@ func BackgroundForegroundHandler(bm image.Image, fm image.Image, savePath string
 		draw.Draw(m, image.Rect(x, y, x+y*2, y*3), sm, image.Point{0, 0}, draw.Over)
 	}
 
-	if err = util.SaveRGBA(m, savePath, util.IT_png); err != nil {
+	if err = util.SaveImage(m, savePath, util.IT_png); err != nil {
 		log.Println(savePath, err)
 		return err
 	}
@@ -402,7 +402,7 @@ func GenerateAppIcon(origin string) error {
 	for _, spec := range appIconSpecifications {
 		im := resize.Resize(uint(spec.Length), uint(spec.Length), bm, resize.Bilinear)
 		fn := path.Join(outputDirectoryPath, "appicon", "ios", "Images.xcassets", "AppIcon.appiconset", spec.Name)
-		if err := util.SaveImage(&im, fn, util.IT_png); err != nil {
+		if err := util.SaveImage(im, fn, util.IT_png); err != nil {
 			log.Println(fn, err)
 			continue
 		}
@@ -486,7 +486,7 @@ func iconScale(inputFile string, outputDir string) error {
 		im := resize.Resize(info.length, info.length, m, resize.Bilinear)
 		for _, relativePath := range info.relativePaths {
 			fn := relativePath[:len(relativePath)-len(filepath.Ext(relativePath))] + ".png"
-			if err := util.SaveImage(&im, fn, util.IT_png); err != nil {
+			if err := util.SaveImage(im, fn, util.IT_png); err != nil {
 				log.Println(err)
 				continue
 			}
@@ -513,7 +513,7 @@ func iOSScale(origin string, templateSize string) error {
 
 		name := filepath.Join(filepath.Dir(origin), filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))]+"@2x"+filepath.Ext(origin))
 		im := resize.Resize(uint(m.Bounds().Size().X*2), uint(m.Bounds().Size().Y*2), m, resize.Bilinear)
-		if err := util.SaveImage(&im, name, util.IT_png); err != nil {
+		if err := util.SaveImage(im, name, util.IT_png); err != nil {
 			return err
 		}
 		if err = util.DoCrush(compress, name); err != nil {
@@ -522,7 +522,7 @@ func iOSScale(origin string, templateSize string) error {
 
 		name = filepath.Join(filepath.Dir(origin), filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))]+"@3x"+filepath.Ext(origin))
 		im = resize.Resize(uint(m.Bounds().Size().X*3), uint(m.Bounds().Size().Y*3), m, resize.Bilinear)
-		if err := util.SaveImage(&im, name, util.IT_png); err != nil {
+		if err := util.SaveImage(im, name, util.IT_png); err != nil {
 			return err
 		}
 		if err = util.DoCrush(compress, name); err != nil {
@@ -554,7 +554,7 @@ func iOSScale(origin string, templateSize string) error {
 		}
 
 		im := resize.Resize(uint(m.Bounds().Size().X/2), uint(m.Bounds().Size().Y/2), m, resize.Bilinear)
-		if err := util.SaveImage(&im, one, util.IT_png); err != nil {
+		if err := util.SaveImage(im, one, util.IT_png); err != nil {
 			return err
 		}
 		if err = util.DoCrush(compress, one); err != nil {
@@ -562,7 +562,7 @@ func iOSScale(origin string, templateSize string) error {
 		}
 
 		im = resize.Resize(uint(m.Bounds().Size().X*3/2), uint(m.Bounds().Size().Y*3/2), m, resize.Bilinear)
-		if err := util.SaveImage(&im, three, util.IT_png); err != nil {
+		if err := util.SaveImage(im, three, util.IT_png); err != nil {
 			return err
 		}
 		if err = util.DoCrush(compress, three); err != nil {
@@ -594,7 +594,7 @@ func iOSScale(origin string, templateSize string) error {
 		}
 
 		im := resize.Resize(uint(m.Bounds().Size().X/3), uint(m.Bounds().Size().Y/3), m, resize.Bilinear)
-		if err := util.SaveImage(&im, one, util.IT_png); err != nil {
+		if err := util.SaveImage(im, one, util.IT_png); err != nil {
 			return err
 		}
 		if err = util.DoCrush(compress, one); err != nil {
@@ -602,7 +602,7 @@ func iOSScale(origin string, templateSize string) error {
 		}
 
 		im = resize.Resize(uint(m.Bounds().Size().X*2/3), uint(m.Bounds().Size().Y*2/3), m, resize.Bilinear)
-		if err := util.SaveImage(&im, two, util.IT_png); err != nil {
+		if err := util.SaveImage(im, two, util.IT_png); err != nil {
 			return err
 		}
 		if err = util.DoCrush(compress, two); err != nil {

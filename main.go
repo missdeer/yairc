@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 
 	"github.com/jackmordaunt/icns"
+	"github.com/missdeer/yairc/util"
 	flag "github.com/spf13/pflag"
 )
 
@@ -63,12 +64,12 @@ func main() {
 
 	if action == "transparent" && inputImagePath != "" {
 		log.Println("transparent color")
-		r, err := OpenURI(inputImagePath)
+		r, err := util.OpenURI(inputImagePath)
 		if err != nil {
 			log.Fatal(err)
 		}
 		defer r.Close()
-		im, format, err := ImageDecode(r)
+		im, format, err := util.ImageDecode(r)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -93,8 +94,10 @@ func main() {
 			fmt.Println(clr, count)
 		}
 		fn := inputImagePath[:len(inputImagePath)-len(filepath.Ext(inputImagePath))] + ".transparent.png"
-		err = SaveImage(&im, fn, it_png)
-		if err != nil {
+		if err = util.SaveImage(&im, fn, util.IT_png); err != nil {
+			log.Fatal(err)
+		}
+		if err = util.DoCrush(compress, fn); err != nil {
 			log.Fatal(err)
 		}
 		return
@@ -103,7 +106,10 @@ func main() {
 	// icon scale mode
 	if action == "icons" && inputImagePath != "" && outputDirectoryPath != "" {
 		log.Println("generate /@2x/@3x/@4x & /x18/x36/x48 icons from", inputImagePath, "to", outputDirectoryPath)
-		iconScale(inputImagePath, outputDirectoryPath)
+		err :=iconScale(inputImagePath, outputDirectoryPath)
+		if err != nil {
+			log.Fatal(err)
+		}
 		return
 	}
 
@@ -147,12 +153,12 @@ func main() {
 
 	// convert to .icns file
 	if action == "icns" && inputImagePath != "" {
-		pngf, err := OpenURI(inputImagePath)
+		pngf, err := util.OpenURI(inputImagePath)
 		if err != nil {
 			log.Fatalf("opening source image: %v", err)
 		}
 		defer pngf.Close()
-		srcImg, _, err := ImageDecode(pngf)
+		srcImg, _, err := util.ImageDecode(pngf)
 		if err != nil {
 			log.Fatalf("decoding source image: %v", err)
 		}

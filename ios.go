@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/missdeer/golib/fsutil"
+	"github.com/missdeer/yairc/util"
 	"github.com/nfnt/resize"
 	"github.com/oliamb/cutter"
 )
@@ -290,6 +291,7 @@ func BackgroundForegroundHandler(bm image.Image, fm image.Image, savePath string
 		})
 		if err != nil {
 			log.Println(savePath, err)
+			return err
 		}
 	}
 	if im.Bounds().Size().Y > spec.Height {
@@ -300,6 +302,7 @@ func BackgroundForegroundHandler(bm image.Image, fm image.Image, savePath string
 		})
 		if err != nil {
 			log.Println(savePath, err)
+			return err
 		}
 	}
 
@@ -317,17 +320,22 @@ func BackgroundForegroundHandler(bm image.Image, fm image.Image, savePath string
 		draw.Draw(m, image.Rect(x, y, x+y*2, y*3), sm, image.Point{0, 0}, draw.Over)
 	}
 
-	if err = SaveRGBA(m, savePath, 1); err != nil {
+	if err = util.SaveRGBA(m, savePath, util.IT_png); err != nil {
 		log.Println(savePath, err)
+		return err
+	}
+	if err = util.DoCrush(compress, savePath); err != nil {
+		log.Println(savePath, err)
+		return err
 	}
 	return nil
 }
 
 func GenerateLaunchImage() (err error) {
 	var bm image.Image
-	reader, err := OpenURI(backgroundImagePath)
+	reader, err := util.OpenURI(backgroundImagePath)
 	if err == nil {
-		bm, _, err = ImageDecode(reader)
+		bm, _, err = util.ImageDecode(reader)
 		reader.Close()
 	}
 
@@ -346,12 +354,12 @@ func GenerateLaunchImage() (err error) {
 		bm = img.SubImage(image.Rect(0, 0, width, height))
 	}
 
-	reader, err = OpenURI(foregroundImagePath)
+	reader, err = util.OpenURI(foregroundImagePath)
 	if err != nil {
 		return err
 	}
 	defer reader.Close()
-	fm, _, err := ImageDecode(reader)
+	fm, _, err := util.ImageDecode(reader)
 	if err != nil {
 		return err
 	}
@@ -370,13 +378,13 @@ func GenerateLaunchImage() (err error) {
 }
 
 func GenerateAppIcon(origin string) error {
-	reader, err := OpenURI(origin)
+	reader, err := util.OpenURI(origin)
 	if err != nil {
 		log.Println(origin, err)
 		return err
 	}
 	defer reader.Close()
-	m, _, err := ImageDecode(reader)
+	m, _, err := util.ImageDecode(reader)
 	if err != nil {
 		log.Println(origin, err)
 		return err
@@ -393,8 +401,13 @@ func GenerateAppIcon(origin string) error {
 	os.MkdirAll(path.Join(outputDirectoryPath, "appicon", "ios", "Images.xcassets", "AppIcon.appiconset"), 0755)
 	for _, spec := range appIconSpecifications {
 		im := resize.Resize(uint(spec.Length), uint(spec.Length), bm, resize.Bilinear)
-		if err := SaveImage(&im, path.Join(outputDirectoryPath, "appicon", "ios", "Images.xcassets", "AppIcon.appiconset", spec.Name), it_png); err != nil {
-			log.Println(spec.Name, err)
+		fn := path.Join(outputDirectoryPath, "appicon", "ios", "Images.xcassets", "AppIcon.appiconset", spec.Name)
+		if err := util.SaveImage(&im, fn, util.IT_png); err != nil {
+			log.Println(fn, err)
+			continue
+		}
+		if err = util.DoCrush(compress, fn); err != nil {
+			log.Println(fn, err)
 		}
 	}
 
@@ -432,13 +445,13 @@ func iconScale(inputFile string, outputDir string) error {
 			return e
 		}
 	}
-	reader, err := OpenURI(inputFile)
+	reader, err := util.OpenURI(inputFile)
 	if err != nil {
 		log.Println(err)
 		return err
 	}
 	defer reader.Close()
-	m, _, err := ImageDecode(reader)
+	m, _, err := util.ImageDecode(reader)
 	if err != nil {
 		log.Println(err)
 		return err
@@ -473,8 +486,12 @@ func iconScale(inputFile string, outputDir string) error {
 		im := resize.Resize(info.length, info.length, m, resize.Bilinear)
 		for _, relativePath := range info.relativePaths {
 			fn := relativePath[:len(relativePath)-len(filepath.Ext(relativePath))] + ".png"
-			if err := SaveImage(&im, fn, it_png); err != nil {
+			if err := util.SaveImage(&im, fn, util.IT_png); err != nil {
 				log.Println(err)
+				continue
+			}
+			if err = util.DoCrush(compress, fn); err != nil {
+				log.Println(fn, err)
 			}
 		}
 	}
@@ -484,28 +501,32 @@ func iconScale(inputFile string, outputDir string) error {
 func iOSScale(origin string, templateSize string) error {
 	switch templateSize {
 	case "1x":
-		reader, err := OpenURI(origin)
+		reader, err := util.OpenURI(origin)
 		if err != nil {
-			log.Println(origin, err)
 			return err
 		}
 		defer reader.Close()
-		m, _, err := ImageDecode(reader)
+		m, _, err := util.ImageDecode(reader)
 		if err != nil {
-			log.Println(origin, err)
 			return err
 		}
 
 		name := filepath.Join(filepath.Dir(origin), filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))]+"@2x"+filepath.Ext(origin))
 		im := resize.Resize(uint(m.Bounds().Size().X*2), uint(m.Bounds().Size().Y*2), m, resize.Bilinear)
-		if err := SaveImage(&im, name, it_png); err != nil {
-			log.Println(name, err)
+		if err := util.SaveImage(&im, name, util.IT_png); err != nil {
+			return err
+		}
+		if err = util.DoCrush(compress, name); err != nil {
+			return err
 		}
 
 		name = filepath.Join(filepath.Dir(origin), filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))]+"@3x"+filepath.Ext(origin))
 		im = resize.Resize(uint(m.Bounds().Size().X*3), uint(m.Bounds().Size().Y*3), m, resize.Bilinear)
-		if err := SaveImage(&im, name, it_png); err != nil {
-			log.Println(name, err)
+		if err := util.SaveImage(&im, name, util.IT_png); err != nil {
+			return err
+		}
+		if err = util.DoCrush(compress, name); err != nil {
+			return err
 		}
 	case "2x":
 		var one, two, three string
@@ -513,33 +534,39 @@ func iOSScale(origin string, templateSize string) error {
 			one = origin
 			two = filepath.Join(filepath.Dir(origin), filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))]+"@2x"+filepath.Ext(origin))
 			three = filepath.Join(filepath.Dir(origin), filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))]+"@3x"+filepath.Ext(origin))
-			os.Rename(origin, two)
+			if err := os.Rename(origin, two); err != nil {
+				return err
+			}
 		} else {
 			one = filepath.Join(filepath.Dir(origin), filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))-3]+filepath.Ext(origin))
 			two = origin
 			three = filepath.Join(filepath.Dir(origin), filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))-3]+"@3x"+filepath.Ext(origin))
 		}
 
-		reader, err := OpenURI(two)
+		reader, err := util.OpenURI(two)
 		if err != nil {
-			log.Println(two, err)
 			return err
 		}
 		defer reader.Close()
-		m, _, err := ImageDecode(reader)
+		m, _, err := util.ImageDecode(reader)
 		if err != nil {
-			log.Println(two, err)
 			return err
 		}
 
 		im := resize.Resize(uint(m.Bounds().Size().X/2), uint(m.Bounds().Size().Y/2), m, resize.Bilinear)
-		if err := SaveImage(&im, one, it_png); err != nil {
-			log.Println(one, err)
+		if err := util.SaveImage(&im, one, util.IT_png); err != nil {
+			return err
+		}
+		if err = util.DoCrush(compress, one); err != nil {
+			return err
 		}
 
 		im = resize.Resize(uint(m.Bounds().Size().X*3/2), uint(m.Bounds().Size().Y*3/2), m, resize.Bilinear)
-		if err := SaveImage(&im, three, it_png); err != nil {
-			log.Println(three, err)
+		if err := util.SaveImage(&im, three, util.IT_png); err != nil {
+			return err
+		}
+		if err = util.DoCrush(compress, three); err != nil {
+			return err
 		}
 	case "3x":
 		var one, two, three string
@@ -547,33 +574,39 @@ func iOSScale(origin string, templateSize string) error {
 			one = origin
 			two = filepath.Join(filepath.Dir(origin), filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))]+"@2x"+filepath.Ext(origin))
 			three = filepath.Join(filepath.Dir(origin), filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))]+"@3x"+filepath.Ext(origin))
-			os.Rename(origin, three)
+			if err := os.Rename(origin, three); err != nil {
+				return err
+			}
 		} else {
 			one = filepath.Join(filepath.Dir(origin), filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))-3]+filepath.Ext(origin))
 			two = filepath.Join(filepath.Dir(origin), filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))-3]+"@2x"+filepath.Ext(origin))
 			three = origin
 		}
 
-		reader, err := OpenURI(three)
+		reader, err := util.OpenURI(three)
 		if err != nil {
-			log.Println(three, err)
 			return err
 		}
 		defer reader.Close()
-		m, _, err := ImageDecode(reader)
+		m, _, err := util.ImageDecode(reader)
 		if err != nil {
-			log.Println(three, err)
 			return err
 		}
 
 		im := resize.Resize(uint(m.Bounds().Size().X/3), uint(m.Bounds().Size().Y/3), m, resize.Bilinear)
-		if err := SaveImage(&im, one, it_png); err != nil {
-			log.Println(one, err)
+		if err := util.SaveImage(&im, one, util.IT_png); err != nil {
+			return err
+		}
+		if err = util.DoCrush(compress, one); err != nil {
+			return err
 		}
 
 		im = resize.Resize(uint(m.Bounds().Size().X*2/3), uint(m.Bounds().Size().Y*2/3), m, resize.Bilinear)
-		if err := SaveImage(&im, two, it_png); err != nil {
-			log.Println(two, err)
+		if err := util.SaveImage(&im, two, util.IT_png); err != nil {
+			return err
+		}
+		if err = util.DoCrush(compress, two); err != nil {
+			return err
 		}
 	default:
 		log.Fatal("unrecognized template size")

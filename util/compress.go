@@ -1,4 +1,4 @@
-package main
+package util
 
 import (
 	"image/png"
@@ -8,6 +8,13 @@ import (
 	"github.com/google/uuid"
 	"github.com/ultimate-guitar/go-imagequant"
 )
+
+func DoCrush(do bool, filePath string) error {
+	if do {
+		return Crush(filePath)
+	}
+	return nil
+}
 
 func Crush(filePath string) error {
 	suffix := uuid.New().String()

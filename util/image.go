@@ -1,4 +1,4 @@
-package main
+package util
 
 import (
 	"errors"
@@ -18,15 +18,14 @@ import (
 )
 
 const (
-	it_png = iota
-	it_jpeg
-	it_gif
-	it_webp
-	it_tiff
+	IT_png = iota
+	IT_jpeg
+	IT_gif
+	IT_webp
+	IT_tiff
 )
 
 // draw.DrawMask(dst, dst.Bounds(), src, image.ZP, &Circle{p, r}, image.ZP, draw.Over)
-
 
 func SaveRGBA(rgba *image.RGBA, savePath string, imageType int) (err error) {
 	var file *os.File
@@ -38,18 +37,15 @@ func SaveRGBA(rgba *image.RGBA, savePath string, imageType int) (err error) {
 	defer file.Close()
 
 	switch imageType {
-	case it_png:
+	case IT_png:
 		err = png.Encode(file, rgba)
-		if err == nil && compress == true {
-			err = Crush(savePath)
-		}
-	case it_jpeg:
+	case IT_jpeg:
 		err = jpeg.Encode(file, rgba, &jpeg.Options{Quality: 100})
-	case it_gif:
+	case IT_gif:
 		err = gif.Encode(file, rgba, &gif.Options{})
-	case it_webp:
+	case IT_webp:
 		err = webp.Encode(file, rgba, &webp.Options{Lossless: true})
-	case it_tiff:
+	case IT_tiff:
 		err = tiff.Encode(file, rgba, &tiff.Options{})
 	default:
 		err = errors.New("unsupported format")
@@ -71,18 +67,15 @@ func SaveImage(img *image.Image, savePath string, imageType int) (err error) {
 	defer file.Close()
 
 	switch imageType {
-	case it_png:
+	case IT_png:
 		err = png.Encode(file, *img)
-		if err == nil && compress == true {
-			err = Crush(savePath)
-		}
-	case it_jpeg:
+	case IT_jpeg:
 		err = jpeg.Encode(file, *img, &jpeg.Options{Quality: 100})
-	case it_gif:
+	case IT_gif:
 		err = gif.Encode(file, *img, &gif.Options{})
-	case it_webp:
+	case IT_webp:
 		err = webp.Encode(file, *img, &webp.Options{Lossless: true})
-	case it_tiff:
+	case IT_tiff:
 		err = tiff.Encode(file, *img, &tiff.Options{})
 	default:
 		err = errors.New("unsupported format")

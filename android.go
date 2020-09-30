@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	"github.com/missdeer/yairc/util"
 	"github.com/nfnt/resize"
 )
 
@@ -40,13 +41,13 @@ func GenerateSplashScreen(origin string) error {
 }
 
 func GenerateLauncherIcon(origin string) error {
-	reader, err := OpenURI(origin)
+	reader, err := util.OpenURI(origin)
 	if err != nil {
 		log.Println(origin, err)
 		return err
 	}
 	defer reader.Close()
-	m, _, err := ImageDecode(reader)
+	m, _, err := util.ImageDecode(reader)
 	if err != nil {
 		log.Println(origin, err)
 		return err
@@ -54,7 +55,11 @@ func GenerateLauncherIcon(origin string) error {
 
 	for _, spec := range LauncherIconSpecifications {
 		im := resize.Resize(uint(spec.Length), uint(spec.Length), m, resize.Bilinear)
-		if err := SaveImage(&im, spec.Name, it_png); err != nil {
+		if err := util.SaveImage(&im, spec.Name, util.IT_png); err != nil {
+			log.Println(spec.Name, err)
+			continue
+		}
+		if err = util.DoCrush(compress, spec.Name); err != nil {
 			log.Println(spec.Name, err)
 		}
 	}

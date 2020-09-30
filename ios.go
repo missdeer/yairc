@@ -317,7 +317,7 @@ func BackgroundForegroundHandler(bm image.Image, fm image.Image, savePath string
 		draw.Draw(m, image.Rect(x, y, x+y*2, y*3), sm, image.Point{0, 0}, draw.Over)
 	}
 
-	if err = saveRGBA(m, savePath, 1); err != nil {
+	if err = SaveRGBA(m, savePath, 1); err != nil {
 		log.Println(savePath, err)
 	}
 	return nil
@@ -393,7 +393,7 @@ func GenerateAppIcon(origin string) error {
 	os.MkdirAll(path.Join(outputDirectoryPath, "appicon", "ios", "Images.xcassets", "AppIcon.appiconset"), 0755)
 	for _, spec := range appIconSpecifications {
 		im := resize.Resize(uint(spec.Length), uint(spec.Length), bm, resize.Bilinear)
-		if err := saveImage(&im, path.Join(outputDirectoryPath, "appicon", "ios", "Images.xcassets", "AppIcon.appiconset", spec.Name), it_png); err != nil {
+		if err := SaveImage(&im, path.Join(outputDirectoryPath, "appicon", "ios", "Images.xcassets", "AppIcon.appiconset", spec.Name), it_png); err != nil {
 			log.Println(spec.Name, err)
 		}
 	}
@@ -473,7 +473,7 @@ func iconScale(inputFile string, outputDir string) error {
 		im := resize.Resize(info.length, info.length, m, resize.Bilinear)
 		for _, relativePath := range info.relativePaths {
 			fn := relativePath[:len(relativePath)-len(filepath.Ext(relativePath))] + ".png"
-			if err := saveImage(&im, fn, it_png); err != nil {
+			if err := SaveImage(&im, fn, it_png); err != nil {
 				log.Println(err)
 			}
 		}
@@ -498,13 +498,13 @@ func iOSScale(origin string, templateSize string) error {
 
 		name := filepath.Join(filepath.Dir(origin), filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))]+"@2x"+filepath.Ext(origin))
 		im := resize.Resize(uint(m.Bounds().Size().X*2), uint(m.Bounds().Size().Y*2), m, resize.Bilinear)
-		if err := saveImage(&im, name, it_png); err != nil {
+		if err := SaveImage(&im, name, it_png); err != nil {
 			log.Println(name, err)
 		}
 
 		name = filepath.Join(filepath.Dir(origin), filepath.Base(origin)[:len(filepath.Base(origin))-len(filepath.Ext(origin))]+"@3x"+filepath.Ext(origin))
 		im = resize.Resize(uint(m.Bounds().Size().X*3), uint(m.Bounds().Size().Y*3), m, resize.Bilinear)
-		if err := saveImage(&im, name, it_png); err != nil {
+		if err := SaveImage(&im, name, it_png); err != nil {
 			log.Println(name, err)
 		}
 	case "2x":
@@ -533,12 +533,12 @@ func iOSScale(origin string, templateSize string) error {
 		}
 
 		im := resize.Resize(uint(m.Bounds().Size().X/2), uint(m.Bounds().Size().Y/2), m, resize.Bilinear)
-		if err := saveImage(&im, one, it_png); err != nil {
+		if err := SaveImage(&im, one, it_png); err != nil {
 			log.Println(one, err)
 		}
 
 		im = resize.Resize(uint(m.Bounds().Size().X*3/2), uint(m.Bounds().Size().Y*3/2), m, resize.Bilinear)
-		if err := saveImage(&im, three, it_png); err != nil {
+		if err := SaveImage(&im, three, it_png); err != nil {
 			log.Println(three, err)
 		}
 	case "3x":
@@ -567,12 +567,12 @@ func iOSScale(origin string, templateSize string) error {
 		}
 
 		im := resize.Resize(uint(m.Bounds().Size().X/3), uint(m.Bounds().Size().Y/3), m, resize.Bilinear)
-		if err := saveImage(&im, one, it_png); err != nil {
+		if err := SaveImage(&im, one, it_png); err != nil {
 			log.Println(one, err)
 		}
 
 		im = resize.Resize(uint(m.Bounds().Size().X*2/3), uint(m.Bounds().Size().Y*2/3), m, resize.Bilinear)
-		if err := saveImage(&im, two, it_png); err != nil {
+		if err := SaveImage(&im, two, it_png); err != nil {
 			log.Println(two, err)
 		}
 	default:

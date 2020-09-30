@@ -93,7 +93,7 @@ func main() {
 			fmt.Println(clr, count)
 		}
 		fn := inputImagePath[:len(inputImagePath)-len(filepath.Ext(inputImagePath))] + ".transparent.png"
-		err = saveImage(&im, fn, it_png)
+		err = SaveImage(&im, fn, it_png)
 		if err != nil {
 			log.Fatal(err)
 		}

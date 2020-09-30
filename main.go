@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-	"image/color"
-	"image/draw"
 	"log"
 	"os"
 	"path/filepath"
@@ -36,7 +34,7 @@ func main() {
 	flag.Uint32VarP(&blue, "blue", "", blue, "set blue threshold")
 	flag.BoolVarP(&compress, "compress", "", true, "compress output PNG files")
 	flag.StringVarP(&platform, "platform", "p", "common", "candidates: ios, android, common")
-	flag.StringVarP(&action, "action", "a", "", "candidats: icons, icns, appIcon, launchImage, transparent")
+	flag.StringVarP(&action, "action", "a", "", "candidats: icons, icns, appIcon, launchImage, transparent, invert, info")
 	flag.StringVarP(&backgroundImagePath, "background", "b", "", "path of background image for launch image")
 	flag.StringVarP(&foregroundImagePath, "foreground", "f", "", "path of foreground image for launch image")
 	flag.StringVarP(&inputImagePath, "input", "i", "", "input image path")
@@ -52,47 +50,6 @@ func main() {
 
 	if showVersion {
 		fmt.Println("yairc version:", GitCommit)
-		return
-	}
-
-	if action == "transparent" && inputImagePath != "" {
-		log.Println("transparent color")
-		r, err := util.OpenURI(inputImagePath)
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer r.Close()
-		im, format, err := util.ImageDecode(r)
-		if err != nil {
-			log.Fatal(err)
-		}
-		log.Println("found format:", format)
-		img, ok := im.(draw.Image)
-		if !ok {
-			log.Fatal("not a drawable image type")
-		}
-		rc := img.Bounds()
-		cm := make(map[color.Color]int)
-		for x := 0; x < rc.Dx(); x++ {
-			for y := 0; y < rc.Dy(); y++ {
-				c := img.At(x, y)
-				r, g, b, _ := c.RGBA()
-				if r > red && g > green && b > blue {
-					img.Set(x, y, color.Transparent)
-				}
-				cm[c]++
-			}
-		}
-		for clr, count := range cm {
-			fmt.Println(clr, count)
-		}
-		fn := inputImagePath[:len(inputImagePath)-len(filepath.Ext(inputImagePath))] + ".transparent.png"
-		if err = util.SaveImage(im, fn, util.IT_png); err != nil {
-			log.Fatal(err)
-		}
-		if err = util.DoCrush(compress, fn); err != nil {
-			log.Fatal(err)
-		}
 		return
 	}
 
@@ -168,4 +125,67 @@ func main() {
 		return
 	}
 
+	args := flag.Args()
+	if inputImagePath != "" {
+		args = append(args, inputImagePath)
+	}
+
+	if action == "transparent" && len(args) > 0 {
+		log.Println("transparent color")
+		for _, uri := range args {
+			im, err := util.Transparent(uri, red, green, blue)
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+			fn := inputImagePath[:len(inputImagePath)-len(filepath.Ext(inputImagePath))] + ".transparent.png"
+			if err = util.SaveImage(im, fn, util.IT_png); err != nil {
+				log.Println(err)
+				continue
+			}
+			if err = util.DoCrush(compress, fn); err != nil {
+				log.Println(err)
+				continue
+			}
+		}
+		return
+	}
+
+	if action == "invert" && len(args) > 0 {
+		log.Println("invert color")
+		for _, uri := range args {
+			im, err := util.Invert(uri)
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+			fn := inputImagePath[:len(inputImagePath)-len(filepath.Ext(inputImagePath))] + ".transparent.png"
+			if err = util.SaveImage(im, fn, util.IT_png); err != nil {
+				log.Println(err)
+				continue
+			}
+			if err = util.DoCrush(compress, fn); err != nil {
+				log.Println(err)
+				continue
+			}
+		}
+		return
+	}
+
+	if action == "info" && len(args) > 0 {
+		log.Println("info color")
+		for _, uri := range args {
+			im, err := util.Info(uri)
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+			fmt.Println(uri)
+			for k, v := range im {
+				fmt.Printf("%s:%d\n", k, v)
+			}
+			fmt.Println("===============================")
+		}
+		return
+	}
 }

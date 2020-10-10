@@ -38,7 +38,7 @@ YAIRC - Yet Another Image Resizer & Cutter, formerly known as TaobaoMobileImageR
 #### 生成icns文件
 
 ```bash
-./yairc --action=icns --input=input.png
+./yairc --action=convert --input=input.png --output=output.icns
 ```
 
 TODO

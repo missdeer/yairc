@@ -15,6 +15,7 @@ import (
 
 	"github.com/chai2010/tiff"
 	"github.com/chai2010/webp"
+	"github.com/jackmordaunt/icns"
 )
 
 const (
@@ -23,6 +24,7 @@ const (
 	IT_gif
 	IT_webp
 	IT_tiff
+	IT_icns
 )
 
 var (
@@ -51,6 +53,8 @@ func SaveImage(img image.Image, savePath string, imageType int) (err error) {
 		err = webp.Encode(file, img, &webp.Options{Lossless: true})
 	case IT_tiff:
 		err = tiff.Encode(file, img, &tiff.Options{})
+	case IT_icns:
+		err = icns.Encode(file, img)
 	default:
 		err = err_unsupported_format
 	}

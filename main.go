@@ -5,8 +5,8 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 
-	"github.com/jackmordaunt/icns"
 	"github.com/missdeer/yairc/util"
 	flag "github.com/spf13/pflag"
 )
@@ -15,8 +15,8 @@ var (
 	compress            bool
 	backgroundImagePath string
 	foregroundImagePath string
-	inputImagePath      string
-	outputDirectoryPath string
+	inputPath           string
+	outputPath          string
 	action              string
 	platform                   = "ios"
 	red                 uint32 = 127
@@ -24,6 +24,16 @@ var (
 	blue                uint32 = 127
 	// Gitcommit contains the commit where we built from.
 	GitCommit string
+
+	imageFormatMap = map[string]int{
+		".icns": util.IT_icns,
+		".png":  util.IT_png,
+		".jpg":  util.IT_jpeg,
+		".jpeg": util.IT_jpeg,
+		".gif":  util.IT_gif,
+		".webp": util.IT_webp,
+		".tiff": util.IT_tiff,
+	}
 )
 
 func main() {
@@ -34,11 +44,11 @@ func main() {
 	flag.Uint32VarP(&blue, "blue", "", blue, "set blue threshold")
 	flag.BoolVarP(&compress, "compress", "", true, "compress output PNG files")
 	flag.StringVarP(&platform, "platform", "p", "common", "candidates: ios, android, common")
-	flag.StringVarP(&action, "action", "a", "", "candidats: icons, icns, appIcon, launchImage, transparent, invert, info")
+	flag.StringVarP(&action, "action", "a", "", "candidats: icons, appIcon, launchImage, transparent, invert, convert, info")
 	flag.StringVarP(&backgroundImagePath, "background", "b", "", "path of background image for launch image")
 	flag.StringVarP(&foregroundImagePath, "foreground", "f", "", "path of foreground image for launch image")
-	flag.StringVarP(&inputImagePath, "input", "i", "", "input image path")
-	flag.StringVarP(&outputDirectoryPath, "output", "o", ".", "output directory path")
+	flag.StringVarP(&inputPath, "input", "i", "", "input image file path")
+	flag.StringVarP(&outputPath, "output", "o", ".", "output directory/file path")
 	flag.BoolVarP(&showHelpMessage, "help", "h", false, "show this help message")
 	flag.BoolVarP(&showVersion, "version", "v", false, "show version number")
 	flag.Parse()
@@ -54,9 +64,9 @@ func main() {
 	}
 
 	// icon scale mode
-	if action == "icons" && inputImagePath != "" && outputDirectoryPath != "" {
-		log.Println("generate /@2x/@3x/@4x & /x18/x36/x48 icons from", inputImagePath, "to", outputDirectoryPath)
-		err := iconScale(inputImagePath, outputDirectoryPath)
+	if action == "icons" && inputPath != "" && outputPath != "" {
+		log.Println("generate /@2x/@3x/@4x & /x18/x36/x48 icons from", inputPath, "to", outputPath)
+		err := iconScale(inputPath, outputPath)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -66,7 +76,7 @@ func main() {
 	// ios app icon mode
 	if action == "appIcon" && platform == "ios" {
 		fmt.Println("output ios app icons")
-		err := GenerateAppIcon(inputImagePath)
+		err := GenerateAppIcon(inputPath)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -85,7 +95,7 @@ func main() {
 
 	if action == "appIcon" && platform == "android" {
 		fmt.Println("output android launcher icons")
-		err := GenerateLauncherIcon(inputImagePath)
+		err := GenerateLauncherIcon(inputPath)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -94,7 +104,7 @@ func main() {
 
 	if action == "launchImage" && platform == "ios" {
 		fmt.Println("output android splash screen images")
-		err := GenerateSplashScreen(inputImagePath)
+		err := GenerateSplashScreen(inputPath)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -102,32 +112,42 @@ func main() {
 	}
 
 	// convert to .icns file
-	if action == "icns" && inputImagePath != "" {
-		pngf, err := util.OpenURI(inputImagePath)
-		if err != nil {
-			log.Fatalf("opening source image: %v", err)
+	if action == "convert" && inputPath != "" {
+		dir := filepath.Dir(outputPath)
+		if _, err := os.Stat(dir); os.IsNotExist(err) {
+			if err = os.MkdirAll(dir, 0755); err != nil {
+				log.Fatal("mkdir failed", err)
+			}
 		}
-		defer pngf.Close()
-		srcImg, _, err := util.ImageDecode(pngf)
+		dest, err := os.Create(outputPath)
 		if err != nil {
-			log.Fatalf("decoding source image: %v", err)
-		}
-		ext := filepath.Ext(inputImagePath)
-		outfile := inputImagePath[0:len(inputImagePath)-len(ext)] + ".icns"
-		dest, err := os.Create(outfile)
-		if err != nil {
-			log.Fatalf("opening destination file: %v", err)
+			log.Fatal("opening destination file failed", err)
 		}
 		defer dest.Close()
-		if err := icns.Encode(dest, srcImg); err != nil {
-			log.Fatalf("encoding icns: %v", err)
+		inFile, err := util.OpenURI(inputPath)
+		if err != nil {
+			log.Fatal("opening source image failed", err)
+		}
+		defer inFile.Close()
+		srcImg, _, err := util.ImageDecode(inFile)
+		if err != nil {
+			log.Fatal("decoding source image failed", err)
+		}
+		outExt := filepath.Ext(outputPath)
+		if it, ok := imageFormatMap[strings.ToLower(outExt)]; ok {
+			err = util.SaveImage(srcImg, outputPath, it)
+		} else {
+			log.Fatal("unsupported target image format")
+		}
+		if err != nil {
+			log.Fatal("encoding failed", err)
 		}
 		return
 	}
 
 	args := flag.Args()
-	if inputImagePath != "" {
-		args = append(args, inputImagePath)
+	if inputPath != "" {
+		args = append(args, inputPath)
 	}
 
 	if action == "transparent" && len(args) > 0 {
@@ -138,14 +158,24 @@ func main() {
 				log.Println(err)
 				continue
 			}
-			fn := inputImagePath[:len(inputImagePath)-len(filepath.Ext(inputImagePath))] + ".transparent.png"
-			if err = util.SaveImage(im, fn, util.IT_png); err != nil {
-				log.Println(err)
-				continue
+			fn := outputPath
+			if fn == "" {
+				fn = inputPath[:len(inputPath)-len(filepath.Ext(inputPath))] + ".transparent.png"
 			}
-			if err = util.DoCrush(compress, fn); err != nil {
-				log.Println(err)
-				continue
+			outExt := filepath.Ext(fn)
+			if it, ok := imageFormatMap[strings.ToLower(outExt)]; ok {
+				if err = util.SaveImage(im, outputPath, it); err != nil {
+					log.Println("encoding failed", err)
+					continue
+				}
+
+				if it == util.IT_png {
+					if err = util.DoCrush(compress, fn); err != nil {
+						log.Println(err)
+					}
+				}
+			} else {
+				log.Println("unsupported target image format")
 			}
 		}
 		return
@@ -159,14 +189,24 @@ func main() {
 				log.Println(err)
 				continue
 			}
-			fn := inputImagePath[:len(inputImagePath)-len(filepath.Ext(inputImagePath))] + ".transparent.png"
-			if err = util.SaveImage(im, fn, util.IT_png); err != nil {
-				log.Println(err)
-				continue
+			fn := outputPath
+			if fn == "" {
+				fn = inputPath[:len(inputPath)-len(filepath.Ext(inputPath))] + ".invert.png"
 			}
-			if err = util.DoCrush(compress, fn); err != nil {
-				log.Println(err)
-				continue
+			outExt := filepath.Ext(fn)
+			if it, ok := imageFormatMap[strings.ToLower(outExt)]; ok {
+				if err = util.SaveImage(im, outputPath, it); err != nil {
+					log.Println("encoding failed", err)
+					continue
+				}
+
+				if it == util.IT_png {
+					if err = util.DoCrush(compress, fn); err != nil {
+						log.Println(err)
+					}
+				}
+			} else {
+				log.Println("unsupported target image format")
 			}
 		}
 		return

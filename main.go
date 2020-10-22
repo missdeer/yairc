@@ -22,8 +22,8 @@ var (
 	red                    uint32 = 127
 	green                  uint32 = 127
 	blue                   uint32 = 127
-	outputHeight           int
-	outputWidth            int
+	outputHeight           uint
+	outputWidth            uint
 	transparentWhiteDirect bool
 	// Gitcommit contains the commit where we built from.
 	GitCommit string
@@ -52,8 +52,8 @@ func main() {
 	flag.StringVarP(&foregroundImagePath, "foreground", "f", "", "path of foreground image for launch image")
 	flag.StringVarP(&inputPath, "input", "i", "", "input image file path")
 	flag.StringVarP(&outputPath, "output", "o", ".", "output directory/file path")
-	flag.IntVarP(&outputHeight, "height", "", 0, "set output image height, 0 for original height")
-	flag.IntVarP(&outputWidth, "width", "", 0, "set output image width, 0 for original width")
+	flag.UintVarP(&outputHeight, "height", "", 0, "set output image height, 0 for original height")
+	flag.UintVarP(&outputWidth, "width", "", 0, "set output image width, 0 for original width")
 	flag.BoolVarP(&transparentWhiteDirect, "transparent-white-direct", "", false, "false - make white color be transparent, true - make black color be transparent")
 	flag.BoolVarP(&showHelpMessage, "help", "h", false, "show this help message")
 	flag.BoolVarP(&showVersion, "version", "v", false, "show version number")
@@ -216,6 +216,36 @@ func main() {
 			}
 		}
 		return
+	}
+
+	if action == "resize" && len(args) > 0 {
+		log.Println("resize images")
+		for _, uri := range args {
+			im, err := util.Resize(uri, outputWidth, outputHeight)
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+			fn := outputPath
+			if fn == "" {
+				fn = inputPath[:len(inputPath)-len(filepath.Ext(inputPath))] + ".resized.png"
+			}
+			outExt := filepath.Ext(fn)
+			if it, ok := imageFormatMap[strings.ToLower(outExt)]; ok {
+				if err = util.SaveImage(im, outputPath, it); err != nil {
+					log.Println("encoding failed", err)
+					continue
+				}
+
+				if it == util.IT_png {
+					if err = util.DoCrush(compress, fn); err != nil {
+						log.Println(err)
+					}
+				}
+			} else {
+				log.Println("unsupported target image format")
+			}
+		}
 	}
 
 	if action == "info" && len(args) > 0 {

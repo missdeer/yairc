@@ -13,9 +13,11 @@ import (
 	"log"
 	"os"
 
+	"github.com/biessek/golang-ico"
 	"github.com/chai2010/tiff"
 	"github.com/chai2010/webp"
 	"github.com/jackmordaunt/icns"
+	"github.com/jsummers/gobmp"
 )
 
 const (
@@ -25,6 +27,8 @@ const (
 	IT_webp
 	IT_tiff
 	IT_icns
+	IT_ico
+	IT_bmp
 )
 
 var (
@@ -55,6 +59,10 @@ func SaveImage(img image.Image, savePath string, imageType int) (err error) {
 		err = tiff.Encode(file, img, &tiff.Options{})
 	case IT_icns:
 		err = icns.Encode(file, img)
+	case IT_ico:
+		err = ico.Encode(file, img)
+	case IT_bmp:
+		err = gobmp.Encode(file, img)
 	default:
 		err = err_unsupported_format
 	}

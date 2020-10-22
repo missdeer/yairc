@@ -8,7 +8,7 @@ import (
 	"log"
 )
 
-func Transparent(uri string, red, green, blue uint32) (image.Image, error) {
+func Transparent(uri string, red, green, blue uint32, transparentWhiteDirect bool) (image.Image, error) {
 	r, err := OpenURI(uri)
 	if err != nil {
 		return nil, err
@@ -29,7 +29,11 @@ func Transparent(uri string, red, green, blue uint32) (image.Image, error) {
 		for y := 0; y < rc.Dy(); y++ {
 			c := img.At(x, y)
 			r, g, b, _ := c.RGBA()
-			if r > red && g > green && b > blue {
+
+			if !transparentWhiteDirect && r > red && g > green && b > blue {
+				img.Set(x, y, color.Transparent)
+			}
+			if transparentWhiteDirect && r < red && g < green && b < blue {
 				img.Set(x, y, color.Transparent)
 			}
 		}

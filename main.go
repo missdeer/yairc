@@ -12,16 +12,19 @@ import (
 )
 
 var (
-	compress            bool
-	backgroundImagePath string
-	foregroundImagePath string
-	inputPath           string
-	outputPath          string
-	action              string
-	platform                   = "ios"
-	red                 uint32 = 127
-	green               uint32 = 127
-	blue                uint32 = 127
+	compress               bool
+	backgroundImagePath    string
+	foregroundImagePath    string
+	inputPath              string
+	outputPath             string
+	action                 string
+	platform                      = "ios"
+	red                    uint32 = 127
+	green                  uint32 = 127
+	blue                   uint32 = 127
+	outputHeight           int
+	outputWidth            int
+	transparentWhiteDirect bool
 	// Gitcommit contains the commit where we built from.
 	GitCommit string
 
@@ -44,11 +47,14 @@ func main() {
 	flag.Uint32VarP(&blue, "blue", "", blue, "set blue threshold")
 	flag.BoolVarP(&compress, "compress", "", true, "compress output PNG files")
 	flag.StringVarP(&platform, "platform", "p", "common", "candidates: ios, android, common")
-	flag.StringVarP(&action, "action", "a", "", "candidats: icons, appIcon, launchImage, transparent, invert, convert, info")
+	flag.StringVarP(&action, "action", "a", "", "candidats: icons, appIcon, launchImage, transparent, invert, resize, convert, info")
 	flag.StringVarP(&backgroundImagePath, "background", "b", "", "path of background image for launch image")
 	flag.StringVarP(&foregroundImagePath, "foreground", "f", "", "path of foreground image for launch image")
 	flag.StringVarP(&inputPath, "input", "i", "", "input image file path")
 	flag.StringVarP(&outputPath, "output", "o", ".", "output directory/file path")
+	flag.IntVarP(&outputHeight, "height", "", 0, "set output image height, 0 for original height")
+	flag.IntVarP(&outputWidth, "width", "", 0, "set output image width, 0 for original width")
+	flag.BoolVarP(&transparentWhiteDirect, "transparent-white-direct", "", false, "false - make white color be transparent, true - make black color be transparent")
 	flag.BoolVarP(&showHelpMessage, "help", "h", false, "show this help message")
 	flag.BoolVarP(&showVersion, "version", "v", false, "show version number")
 	flag.Parse()
@@ -153,7 +159,7 @@ func main() {
 	if action == "transparent" && len(args) > 0 {
 		log.Println("transparent color")
 		for _, uri := range args {
-			im, err := util.Transparent(uri, red, green, blue)
+			im, err := util.Transparent(uri, red, green, blue, transparentWhiteDirect)
 			if err != nil {
 				log.Println(err)
 				continue
@@ -222,7 +228,8 @@ func main() {
 			}
 			fmt.Println(uri)
 			for k, v := range im {
-				fmt.Printf("%s:%d\n", k, v)
+				r, g, b, a := k.RGBA()
+				fmt.Printf("r=%3d,g=%3d,b=%3d,a=%3d: count:=%d\n", r, g, b, a, v)
 			}
 			fmt.Println("===============================")
 		}

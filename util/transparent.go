@@ -29,7 +29,9 @@ func Transparent(uri string, red, green, blue uint32, transparentWhiteDirect boo
 		for y := 0; y < rc.Dy(); y++ {
 			c := img.At(x, y)
 			r, g, b, _ := c.RGBA()
-
+			r &= 0xff
+			g &= 0xff
+			b &= 0xff
 			if !transparentWhiteDirect && r > red && g > green && b > blue {
 				img.Set(x, y, color.Transparent)
 			}

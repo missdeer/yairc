@@ -7,8 +7,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/missdeer/yairc/util"
 	flag "github.com/spf13/pflag"
+
+	"github.com/missdeer/yairc/util"
 )
 
 var (
@@ -36,6 +37,8 @@ var (
 		".gif":  util.IT_gif,
 		".webp": util.IT_webp,
 		".tiff": util.IT_tiff,
+		".ico":  util.IT_ico,
+		".bmp":  util.IT_bmp,
 	}
 )
 
@@ -117,7 +120,7 @@ func main() {
 		return
 	}
 
-	// convert to .icns file
+	// convert  file format
 	if action == "convert" && inputPath != "" {
 		dir := filepath.Dir(outputPath)
 		if _, err := os.Stat(dir); os.IsNotExist(err) {
@@ -257,9 +260,9 @@ func main() {
 				continue
 			}
 			fmt.Println(uri)
-			for k, v := range im {
+			for k, c := range im {
 				r, g, b, a := k.RGBA()
-				fmt.Printf("r=%3d,g=%3d,b=%3d,a=%3d: count:=%d\n", r, g, b, a, v)
+				fmt.Printf("r=%3d,g=%3d,b=%3d,a=%3d: count:=%d\n", r&0xff, g&0xff, b&0xff, a&0xff, c)
 			}
 			fmt.Println("===============================")
 		}

@@ -19,12 +19,14 @@ var (
 	inputPath              string
 	outputPath             string
 	action                 string
+	cutEdgePosition        string
 	platform                      = "ios"
 	red                    uint32 = 127
 	green                  uint32 = 127
 	blue                   uint32 = 127
 	outputHeight           uint
 	outputWidth            uint
+	cutEdgeStep            uint = 1
 	transparentWhiteDirect bool
 	// Gitcommit contains the commit where we built from.
 	GitCommit string
@@ -50,11 +52,13 @@ func main() {
 	flag.Uint32VarP(&blue, "blue", "", blue, "set blue threshold")
 	flag.BoolVarP(&compress, "compress", "", true, "compress output PNG files")
 	flag.StringVarP(&platform, "platform", "p", "common", "candidates: ios, android, common")
-	flag.StringVarP(&action, "action", "a", "", "candidats: icons, appIcon, launchImage, transparent, invert, resize, convert, info")
+	flag.StringVarP(&action, "action", "a", "", "candidats: icons, appIcon, launchImage, transparent, invert, resize, convert, cutedge, info")
 	flag.StringVarP(&backgroundImagePath, "background", "b", "", "path of background image for launch image")
 	flag.StringVarP(&foregroundImagePath, "foreground", "f", "", "path of foreground image for launch image")
 	flag.StringVarP(&inputPath, "input", "i", "", "input image file path")
 	flag.StringVarP(&outputPath, "output", "o", ".", "output directory/file path")
+	flag.StringVarP(&cutEdgePosition, "cut-edge-position", "e", "", "cut edge position, candidates: (l)eft, (r)ight, (t)op, (b)ottom, (h)orizontal, (v)ertical, (a)ll")
+	flag.UintVarP(&cutEdgeStep, "cut-edge-step", "", cutEdgeStep, "cut edge step")
 	flag.UintVarP(&outputHeight, "height", "", 0, "set output image height, 0 for original height")
 	flag.UintVarP(&outputWidth, "width", "", 0, "set output image width, 0 for original width")
 	flag.BoolVarP(&transparentWhiteDirect, "transparent-white-direct", "", false, "false - make white color be transparent, true - make black color be transparent")
@@ -232,6 +236,36 @@ func main() {
 			fn := outputPath
 			if fn == "" {
 				fn = inputPath[:len(inputPath)-len(filepath.Ext(inputPath))] + ".resized.png"
+			}
+			outExt := filepath.Ext(fn)
+			if it, ok := imageFormatMap[strings.ToLower(outExt)]; ok {
+				if err = util.SaveImage(im, outputPath, it); err != nil {
+					log.Println("encoding failed", err)
+					continue
+				}
+
+				if it == util.IT_png {
+					if err = util.DoCrush(compress, fn); err != nil {
+						log.Println(err)
+					}
+				}
+			} else {
+				log.Println("unsupported target image format")
+			}
+		}
+	}
+
+	if action == "cutedge" && len(args) > 0 {
+		log.Println("cut edge of images")
+		for _, uri := range args {
+			im, err := util.CutEdge(uri, cutEdgePosition, cutEdgeStep)
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+			fn := outputPath
+			if fn == "" {
+				fn = inputPath[:len(inputPath)-len(filepath.Ext(inputPath))] + ".cutedge.png"
 			}
 			outExt := filepath.Ext(fn)
 			if it, ok := imageFormatMap[strings.ToLower(outExt)]; ok {

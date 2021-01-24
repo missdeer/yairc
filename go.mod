@@ -7,7 +7,7 @@ require (
 	github.com/biessek/golang-ico v0.0.0-20180326222316-d348d9ea4670
 	github.com/chai2010/tiff v0.0.0-20200705094435-2b8a7f42fe29
 	github.com/chai2010/webp v1.1.0
-	github.com/google/uuid v1.1.5
+	github.com/google/uuid v1.2.0
 	github.com/jackmordaunt/icns v1.0.0
 	github.com/jsummers/gobmp v0.0.0-20151104160322-e2ba15ffa76e
 	github.com/missdeer/golib v1.0.4

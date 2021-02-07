@@ -2,8 +2,6 @@ package util
 
 import (
 	"bytes"
-	"compress/flate"
-	"compress/gzip"
 	"errors"
 	"io"
 	"io/ioutil"
@@ -11,6 +9,9 @@ import (
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/klauspost/compress/flate"
+	"github.com/klauspost/compress/gzip"
 
 	"github.com/andybalholm/brotli"
 )

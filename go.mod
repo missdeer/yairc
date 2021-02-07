@@ -10,6 +10,7 @@ require (
 	github.com/google/uuid v1.2.0
 	github.com/jackmordaunt/icns v1.0.0
 	github.com/jsummers/gobmp v0.0.0-20151104160322-e2ba15ffa76e
+	github.com/klauspost/compress v1.11.7
 	github.com/missdeer/golib v1.0.4
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/oliamb/cutter v0.2.2

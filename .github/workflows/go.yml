@@ -17,7 +17,7 @@ jobs:
 
     - name: Build
       run: |
-        env CGO_ENABLED=1 GOARCH=amd64 GOOS=darwin go build -ldflags="-s -w"  -o darwin-amd64/yairc
+        env CGO_ENABLED=1 GOOS=darwin go build -ldflags="-s -w"  -o darwin-amd64/yairc
         env GOPATH=$PWD/gopath go get -u github.com/missdeer/cicdutil
 
     - name: Upload artifact yairc-darwin-amd64

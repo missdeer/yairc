@@ -43,5 +43,5 @@ YAIRC - Yet Another Image Resizer & Cutter, formerly known as TaobaoMobileImageR
 
 TODO
 ----
-- [] 支持Android App的splash image生成
-- [] 支持Android App的app icon生成
+- [ ] 支持Android App的splash image生成
+- [ ] 支持Android App的app icon生成

@@ -18,17 +18,12 @@ jobs:
     - name: Build
       run: |
         env CGO_ENABLED=1 GOOS=darwin go build -ldflags="-s -w"  -o darwin-amd64/yairc
-        env GOPATH=$PWD/gopath go get -u github.com/missdeer/cicdutil
 
     - name: Upload artifact yairc-darwin-amd64
       uses: actions/upload-artifact@v1.0.0
       with:
         name: yairc-darwin-amd64
         path: darwin-amd64
-
-    - name: Remove old artifacts
-      run: |
-        gopath/bin/cicdutil -p github -u missdeer -t ${{ secrets.GH_TOKEN }} -r yairc -k 0 -a delete
 
   WindowsLinux:
     runs-on: ubuntu-latest

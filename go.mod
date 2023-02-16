@@ -3,7 +3,7 @@ module github.com/missdeer/yairc
 go 1.14
 
 require (
-	github.com/andybalholm/brotli v1.0.4
+	github.com/andybalholm/brotli v1.0.5
 	github.com/biessek/golang-ico v0.0.0-20180326222316-d348d9ea4670
 	github.com/chai2010/tiff v0.0.0-20211005095045-4ec2aa243943
 	github.com/chai2010/webp v1.1.1

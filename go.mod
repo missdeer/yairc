@@ -11,7 +11,7 @@ require (
 	github.com/jackmordaunt/icns v1.0.0
 	github.com/jsummers/gobmp v0.0.0-20151104160322-e2ba15ffa76e
 	github.com/klauspost/compress v1.17.7
-	github.com/missdeer/golib v1.0.8
+	github.com/missdeer/golib v1.0.9
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/oliamb/cutter v0.2.2
 	github.com/pkg/errors v0.9.1 // indirect

@@ -16,7 +16,7 @@ require (
 	github.com/missdeer/golib v1.0.9
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/oliamb/cutter v0.2.2
-	github.com/spf13/pflag v1.0.5
+	github.com/spf13/pflag v1.0.6
 	github.com/ultimate-guitar/go-imagequant v0.0.0-20201216103743-29e607cca148
 )
 

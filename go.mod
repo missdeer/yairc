@@ -5,7 +5,7 @@ go 1.22
 toolchain go1.23.6
 
 require (
-	github.com/andybalholm/brotli v1.1.1
+	github.com/andybalholm/brotli v1.2.0
 	github.com/biessek/golang-ico v0.0.0-20180326222316-d348d9ea4670
 	github.com/chai2010/tiff v0.0.0-20211005095045-4ec2aa243943
 	github.com/chai2010/webp v1.4.0
